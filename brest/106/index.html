@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<title>Bien'to</title>
+<base href="../">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bien'to: демо-сайт">
+<meta property="og:description" content="Bien’to — вкусные встречи в Бресте">
+<meta property="og:url" content="https://superbatman191-commits.github.io/brest/106/">
+<meta property="og:image" content="https://superbatman191-commits.github.io/brest/ig/106/p3.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script>if(!location.hash)history.replaceState(null,"",location.pathname+location.search+"#d106")</script>
+<meta name="robots" content="noindex, nofollow">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Prata&family=Oswald:wght@500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<style>
+/* Layout: hub = list rail + offer sheet (message, arguments, live demo in a browser frame); #d<ID> = demo site alone, full page */
+:root{
+  --bg:#f3f4f1; --panel:#ffffff; --ink:#1d2320; --mute:#66706a; --line:#dde1dc;
+  --accent:#2f6b4f; --accent-ink:#ffffff; --warn:#a4561c; --chip:#e8ece7;
+  --f-ui:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141816; --panel:#1c211e; --ink:#e7ebe6; --mute:#9aa49d; --line:#2c332f;
+  --accent:#6fbf95; --accent-ink:#0f1a14; --warn:#e09a5e; --chip:#252c28; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141816; --panel:#1c211e; --ink:#e7ebe6; --mute:#9aa49d; --line:#2c332f;
+  --accent:#6fbf95; --accent-ink:#0f1a14; --warn:#e09a5e; --chip:#252c28; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-ui)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- hub ---------- */
+.hub{display:grid;grid-template-columns:minmax(260px,330px) 1fr;gap:20px;max-width:1440px;margin:0 auto;
+  padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail{display:flex;flex-direction:column;gap:10px;min-width:0}
+.rail h1{font-size:22px;line-height:1.2;margin:0;text-wrap:balance}
+.rail p.lead{margin:0;color:var(--mute);font-size:13px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters input{flex:1 1 140px;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.filters select{padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.list{display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 170px);overflow:auto;padding-right:4px}
+.item{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:10px;border:0;background:none;text-align:left;cursor:pointer}
+.item:hover{background:var(--chip)}
+.item[aria-current="true"]{background:var(--panel);box-shadow:0 0 0 1px var(--line)}
+.ava{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--chip);display:grid;place-items:center;font-weight:600;font-size:13px;color:var(--mute)}
+.item b{display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item small{color:var(--mute);font-size:12px}
+.item>span:nth-child(2){min-width:0}
+.stars{font-size:12px;color:var(--warn);font-variant-numeric:tabular-nums}
+
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.sheet header{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.sheet header img{width:56px;height:56px;border-radius:50%;object-fit:cover}
+.sheet h2{margin:0;font-size:24px;line-height:1.2;text-wrap:balance}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{background:var(--chip);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--mute)}
+.chip.warn{color:var(--warn)}
+.chip a{color:inherit}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:22px}
+.block h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.msg{white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{border:0;border-radius:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.why{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.why li{padding-left:14px;border-left:2px solid var(--accent);font-size:14px}
+.price{font-size:14px;color:var(--mute)}
+.price b{color:var(--ink);font-size:20px;font-variant-numeric:tabular-nums}
+.frame{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--mute)}
+.bar i{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
+.bar span{margin-left:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.frame .viewport{height:640px;overflow:auto}
+.contacts{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.contacts .how{margin:0 0 4px;font-weight:600}
+.contacts .how.warn{color:var(--warn)}
+.item.closed{opacity:.5}
+.ct .row{grid-column:2;margin:0}
+.ct .btn{color:var(--accent-ink);text-decoration:none;padding:5px 12px}
+.ct{display:grid;grid-template-columns:96px 1fr;gap:2px 10px;align-items:baseline;padding-block:5px;border-bottom:1px solid var(--line)}
+.ct>span{color:var(--mute);font-size:12px;grid-row:span 3}
+.ct small{color:var(--mute);font-size:12px;grid-column:2}
+.ct a{color:var(--accent);grid-column:2;width:max-content}
+.ct .num{font-variant-numeric:tabular-nums;user-select:all}
+.status{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.note{flex:1 1 220px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.mute{color:var(--mute);font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--mute)}
+.dot.st-sent{background:#3d7fd6}.dot.st-replied{background:#d6a23d}.dot.st-deal{background:#3dae6b}.dot.st-refused{background:#c4513f}
+.kit h2{font-size:22px;margin:28px 0 8px}.kit h3{font-size:17px;margin:20px 0 6px}.kit h4{font-size:15px;margin:22px 0 4px}
+.kit p{margin:6px 0}.kit p:has(b){background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:copy}
+.kit li{margin:3px 0}
+details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px}
+@media (max-width:980px){.cols{grid-template-columns:1fr}}
+@media (max-width:760px){.hub{grid-template-columns:1fr}.list{max-height:280px}.sheet{padding:16px}}
+
+/* ---------- demo site (its own palette via --d-bg / --d-ac set inline) ---------- */
+.site{--d-bg:#faf7f2;--d-ac:#8a3b2e;--d-fg:#1e1b18;--d-mute:color-mix(in srgb,var(--d-fg) 62%,var(--d-bg));
+  --d-soft:color-mix(in srgb,var(--d-ac) 9%,var(--d-bg));--d-disp:"Prata",Georgia,serif;
+  background:var(--d-bg);color:var(--d-fg);font:15px/1.55 var(--f-ui);min-height:100%}
+.site.dark{--d-fg:#f2efe9}
+.site.f-auto{--d-disp:"Oswald","Arial Narrow",sans-serif}
+.site.f-beauty{--d-disp:"Cormorant Garamond",Georgia,serif}
+.site.f-clean{--d-disp:"Golos Text",system-ui,sans-serif}
+.s-wrap{max-width:1080px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.s-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:14px;flex-wrap:wrap}
+.s-logo{font-family:var(--d-disp);font-size:20px;font-weight:600;display:flex;gap:10px;align-items:center}
+.s-logo img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.s-links{display:flex;gap:16px;font-size:13px;color:var(--d-mute);flex-wrap:wrap}
+.s-cta{background:var(--d-ac);color:var(--d-on);border:0;border-radius:999px;padding:10px 20px;font-weight:600;cursor:pointer;white-space:nowrap}
+.s-hero{display:grid;grid-template-columns:1.15fr 1fr;border-radius:18px;overflow:hidden;background:var(--d-ac);color:var(--d-on)}
+.s-hero.nophoto{grid-template-columns:1fr}
+.s-hero .ph{position:relative;min-height:340px;overflow:hidden}
+.s-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.s-hero .in{padding:clamp(22px,4vw,44px);display:flex;flex-direction:column;justify-content:center;gap:14px;min-width:0;
+  background:linear-gradient(160deg,var(--d-ac),color-mix(in srgb,var(--d-ac) 78%,#000))}
+.s-hero h1{font-family:var(--d-disp);font-size:clamp(30px,4.4vw,48px);line-height:1.08;margin:0;font-weight:600;text-wrap:balance}
+.site.f-auto .s-hero h1{text-transform:uppercase;letter-spacing:.01em}
+.s-hero p{margin:0;font-size:16px;opacity:.92}
+.s-hero .tags{display:flex;gap:8px;flex-wrap:wrap;font-size:12px}
+.s-hero .tags span{background:color-mix(in srgb,var(--d-on) 16%,transparent);padding:3px 10px;border-radius:999px}
+.s-hero .s-cta{background:var(--d-on);color:var(--d-ac);justify-self:start;width:max-content}
+.s-sec{padding-block:44px;display:flex;flex-direction:column;gap:18px}
+.s-sec h2{font-family:var(--d-disp);font-size:clamp(24px,3.4vw,34px);margin:0;font-weight:600;line-height:1.15}
+.s-feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.s-feat div{background:var(--d-soft);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.s-feat b{font-size:15px}
+.s-feat small{color:var(--d-mute);font-size:13px}
+.s-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.s-gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;max-width:100%}
+.s-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px 28px}
+.s-menu div{display:flex;justify-content:space-between;gap:12px;padding-block:10px;border-bottom:1px dashed color-mix(in srgb,var(--d-fg) 22%,transparent)}
+.s-menu span:last-child{color:var(--d-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.s-book{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:var(--d-soft);border-radius:18px;padding:26px}
+.s-book form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.s-book input,.s-book select{padding:11px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--d-fg) 18%,transparent);background:var(--d-bg);min-width:0}
+.s-book .s-cta{grid-column:1/-1}
+.s-book .ok{grid-column:1/-1;font-size:13px;color:var(--d-mute)}
+.s-foot{padding-block:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;font-size:14px;border-top:1px solid color-mix(in srgb,var(--d-fg) 14%,transparent)}
+.s-foot b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--d-mute);font-weight:600;margin-bottom:4px}
+.s-foot a{color:var(--d-ac)}
+.s-demo{font-size:12px;text-align:center;color:var(--d-mute);padding-block:16px}
+.frame .s-hero{grid-template-columns:1fr}.frame .s-hero .ph{min-height:260px;order:-1}
+@media (max-width:700px){.s-hero{grid-template-columns:1fr}.s-hero .ph{order:-1;min-height:260px}.s-book,.s-book form{grid-template-columns:1fr}.s-gal{grid-template-columns:repeat(2,1fr)}.s-links{display:none}}
+@media (prefers-reduced-motion:no-preference){.s-hero img{animation:kb 18s ease-out both}@keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}}
+</style>
+
+<div id="app"></div>
+
+<script>
+const CAT = {
+  restaurant:["food","Ресторан"],cafe:["food","Кафе"],bar:["food","Бар"],pub:["food","Паб"],fast_food:["food","Фастфуд"],
+  confectionery:["food","Кондитерская"],hairdresser:["beauty","Парикмахерская"],beauty:["beauty","Салон красоты"],
+  massage:["beauty","Массаж"],dentist:["clean","Стоматология"],car_repair:["auto","Автосервис"],car_wash:["auto","Автомойка"],
+  apartment:["stay","Апартаменты"],guest_house:["stay","Агроусадьба"],fitness_centre:["auto","Спорт"],
+  "craft:window_construction":["auto","Окна"]
+};
+const FONT = {food:"",beauty:"f-beauty",auto:"f-auto",clean:"f-clean",stay:"f-clean"};
+// sample content per kind, clearly a placeholder the owner replaces
+const SAMPLE = {
+  food:{title:"Из меню",rows:[["Фирменное блюдо шефа","—"],["Суп дня","—"],["Горячее на компанию","—"],["Десерт","—"],["Лимонад домашний","—"],["Бизнес-ланч","—"]],form:["Дата","Время","Гостей"]},
+  beauty:{title:"Услуги и цены",rows:[["Стрижка женская","—"],["Окрашивание","—"],["Маникюр с покрытием","—"],["Укладка","—"],["Уход для волос","—"],["Мужская стрижка","—"]],form:["Услуга","Дата","Время"]},
+  auto:{title:"Услуги и цены",rows:[["Диагностика","—"],["Замена масла","—"],["Ходовая","—"],["Шиномонтаж","—"],["Компьютерная диагностика","—"],["Ремонт двигателя","—"]],form:["Марка авто","Дата","Услуга"]},
+  clean:{title:"Услуги и цены",rows:[["Консультация","—"],["Профгигиена","—"],["Лечение кариеса","—"],["Имплантация","—"],["Отбеливание","—"],["Детский приём","—"]],form:["Услуга","Дата","Время"]},
+  stay:{title:"Номера",rows:[["Студия на 2 гостей","—"],["Апартаменты с кухней","—"],["Семейный вариант","—"],["Долгий срок — скидка","—"]],form:["Заезд","Выезд","Гостей"]}
+};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dark = hex => { const n = parseInt((hex||"#fff").slice(1),16); return ((n>>16)*.299+((n>>8)&255)*.587+(n&255)*.114) < 120; };
+
+function demo(o){
+  const [kind,label] = CAT[o.cat] || ["clean",""];
+  const s = SAMPLE[kind];
+  const [bg,ac] = o.palette || ["#faf7f2","#8a3b2e"];
+  const ph = (o.photos||[]).filter(p=>p.f!==o.hero);
+  const map = `https://yandex.by/maps/?text=${encodeURIComponent(o.name+" "+o.addr+" Брест")}`;
+  return `<div class="site ${FONT[kind]} ${dark(bg)?"dark":""}" style="--d-bg:${esc(bg)};--d-ac:${esc(ac)};--d-on:${dark(ac)?"#fff":"#1b1712"}">
+  <div class="s-wrap">
+    <nav class="s-nav"><div class="s-logo">${o.avatar?`<img src="${esc(o.avatar)}" alt="">`:""}${esc(o.name)}</div>
+      <div class="s-links">${(o.sections||[]).slice(0,4).map(x=>`<span>${esc(x)}</span>`).join("")}</div>
+      <button class="s-cta" type="button" data-go="book">${esc(o.cta||"Связаться")}</button></nav>
+    <section class="s-hero ${o.hero?"":"nophoto"}">
+      <div class="in"><div class="tags"><span>${esc(label)}</span><span>Брест, ${esc(o.addr)}</span>${o.hours?`<span>${esc(o.hours)}</span>`:""}</div>
+      <h1>${esc(o.headline||o.name)}</h1><p>${esc(o.sub||o.idea||"")}</p>
+      <div><button class="s-cta" type="button" data-go="book">${esc(o.cta||"Связаться")}</button></div></div>
+      ${o.hero?`<div class="ph"><img src="${esc(o.hero)}" alt="${esc(o.name)}"></div>`:""}</section>
+    <section class="s-sec"><h2>Почему к нам</h2><div class="s-feat">${(o.features||[]).map(f=>`<div><b>${esc(f)}</b></div>`).join("")}</div></section>
+    ${ph.length?`<section class="s-sec"><h2>Атмосфера</h2><div class="s-gal">${ph.slice(0,6).map(p=>`<img src="${esc(p.f)}" alt="" loading="lazy">`).join("")}</div></section>`:""}
+    <section class="s-sec"><h2>${s.title}</h2><div class="s-menu">${s.rows.map(r=>`<div><span>${r[0]}</span><span>цена</span></div>`).join("")}</div></section>
+    <section class="s-sec" id="book-${o.i}"><div class="s-book"><div><h2>${esc(o.cta||"Онлайн-заявка")}</h2><p>Заявка приходит владельцу в Telegram или Viber за секунду. Клиенту не нужно дозваниваться.</p></div>
+      <form data-demo>${s.form.map((f,k)=>`<input id="f${o.i}-${k}" placeholder="${f}" aria-label="${f}">`).join("")}<input id="f${o.i}-t" placeholder="Телефон" aria-label="Телефон"><button class="s-cta">${esc(o.cta||"Отправить")}</button><div class="ok" hidden>Это демо: на рабочем сайте заявка сразу уйдёт вам в мессенджер.</div></form></div></section>
+    <footer class="s-foot"><div><b>Адрес</b>Брест, ${esc(o.addr)}<br><a href="${map}" target="_blank" rel="noopener">Открыть на карте</a></div>
+      <div><b>Часы работы</b>${esc(o.hours||"уточняйте по телефону")}</div>
+      ${o.contacts?.phones?.[0]?`<div><b>Телефон</b>${esc(o.contacts.phones[0].n)}</div>`:""}
+      ${o.ig?`<div><b>Instagram</b><a href="https://instagram.com/${esc(o.ig.h)}" target="_blank" rel="noopener">@${esc(o.ig.h)}</a></div>`:""}</footer>
+    <div class="s-demo">Демо-версия сайта, подготовлена для «${esc(o.name)}». Тексты и цены заменяются на ваши.</div>
+  </div></div>`;
+}
+
+let DATA = [], cur = null;
+// reply statuses live in the artifact db (collection "status", one doc per org id); absent outside the claude.ai viewer
+const STATUSES = [["new","Новый"],["sent","Написал"],["replied","Ответили"],["deal","Договорились"],["refused","Отказ"]];
+let ST = {}, DB = null;
+const stOf = o => (ST[o.i] && ST[o.i].s) || "new";
+async function initDb(){
+  DB = window.claude?.use ? await window.claude.use("db").catch(() => null) : null;
+  if (!DB) return;
+  DB.collection("status").onSnapshot(snap => {
+    ST = {}; snap.docs.forEach(d => { if (d.exists) ST[d.id] = d.data(); });
+    window._draw && window._draw(); if (cur) drawStatus(cur);
+  }, () => {});
+  if (cur) drawStatus(cur);
+}
+function drawStatus(o){
+  const box = document.getElementById("st"); if (!box) return;
+  if (!DB) { box.innerHTML = `<small class="mute">Статусы сохраняются в опубликованной версии страницы на claude.ai.</small>`; return; }
+  const s = stOf(o), note = (ST[o.i] && ST[o.i].note) || "", at = ST[o.i] && ST[o.i].at;
+  box.innerHTML = `<div class="seg" role="group" aria-label="Статус">${STATUSES.map(([v,l]) => `<button type="button" data-st="${v}" aria-pressed="${s===v}" class="st-${v}">${l}</button>`).join("")}</div>
+    <input id="note-${o.i}" class="note" placeholder="Заметка: кто ответил, когда перезвонить" value="${esc(note)}">
+    ${at ? `<small class="mute">Обновлено ${new Date(at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small>` : ""}`;
+  const save = (patch) => DB.collection("status").doc(String(o.i)).set({ s: stOf(o), note: (ST[o.i] && ST[o.i].note) || "", ...patch, at: new Date().toISOString() })
+    .catch(e => toast(e && e.code === "permission_denied" ? "Нет прав на запись" : "Не сохранилось, попробуйте ещё раз"));
+  box.querySelector(".seg").onclick = e => { const b = e.target.closest("[data-st]"); if (b && b.dataset.st !== s) save({ s: b.dataset.st }); };
+  const n = box.querySelector(".note"); n.onchange = () => { if (n.value !== note) save({ note: n.value.slice(0, 500) }); };
+}
+const app = document.getElementById("app");
+const toast = t => { const d = document.createElement("div"); d.className="toast"; d.textContent=t; document.body.append(d); setTimeout(()=>d.remove(),1800); };
+const copy = (t, done, el) => navigator.clipboard.writeText(t).then(()=>toast(done)).catch(()=>{ if (!el) return; const r=document.createRange(); r.selectNodeContents(el); getSelection().removeAllRanges(); getSelection().addRange(r); toast("Выделено, нажмите Ctrl+C"); });
+// sales kit page (#kit): sending rules, objection replies, call script, agreement; click a reply to copy it
+async function renderKit(){
+  document.title = "Скрипты и возражения";
+  app.innerHTML = `<div class="hub kit" style="display:block;max-width:760px"><p><a href="#">← К списку организаций</a></p><div id="kitb">Загрузка…</div></div>`;
+  const k = await fetch("kit.json").then(r => r.json()).catch(() => null);
+  const box = document.getElementById("kitb"); if (!box) return;
+  box.innerHTML = k ? k.html : "Не удалось загрузить kit.json";
+  box.onclick = e => { const p = e.target.closest("p"); if (!p || !p.querySelector("b")) return; const t = p.innerText.replace(/^Вариант \d+:\s*/, "").trim(); copy(t, "Ответ скопирован", p); };
+}
+const stars = n => "★".repeat(n) + "☆".repeat(5-n);
+
+// where to write: Instagram DM first (the message mentions their profile), then mobile (Viber/Telegram/WhatsApp), landline = call
+function contactsBlock(o){
+  const c = o.contacts || {}, ph = c.phones || [], lg = c.legal, ms = c.messengers || [], y = c.yandex;
+  const mob = ph.find(p => p.mobile);
+  const how = o.closed ? "Не писать: на Яндекс Картах организация отмечена как закрытая"
+    : ms.length ? `Написать в ${ms[0].t}: мессенджер указан самой организацией`
+    : c.instagram ? "Написать в директ Instagram"
+    : mob ? "Позвонить на мобильный; мессенджеры на этом номере не подтверждены"
+    : ph.length ? "Позвонить, попросить контакт владельца" : "Зайти лично, контактов в открытом доступе нет";
+  return `<div class="block"><h3>Куда писать</h3><div class="contacts">
+    <p class="how${o.closed?" warn":""}">${how}</p>
+    ${ms.length ? `<div class="ct"><span>Мессенджеры</span><div class="row">${ms.map(m => `<a class="btn" href="${esc(m.u)}" target="_blank" rel="noopener">${esc(m.t)}</a>`).join("")}</div><small>из карточки на Яндекс Картах</small></div>` : ""}
+    ${c.instagram ? `<div class="ct"><span>Instagram</span><a href="${esc(c.instagram)}" target="_blank" rel="noopener">${esc(c.instagram.replace("https://",""))}</a></div>` : ""}
+    ${ph.map(p => `<div class="ct"><span>${p.mobile ? "Мобильный" : "Городской"}</span><b class="num">${esc(p.n)}</b><small>${esc(p.src)}</small></div>`).join("")}
+    ${y && (y.rating || y.note) ? `<div class="ct"><span>Яндекс Карты</span>${y.rating ? `<b>★ ${esc(y.rating.replace(".",","))}</b><small>${y.votes} оценок</small>` : ""}${y.note ? `<small>${esc(y.note)}</small>` : ""}</div>` : ""}
+    ${lg ? `<div class="ct"><span>Юрлицо</span><b>${esc(lg.name)}</b><small>УНП ${esc(lg.unp)} · ${esc(lg.status)}${lg.liq ? " · " + esc(lg.liq) : ""} · реестр МНС</small></div>` : `<div class="ct"><span>Юрлицо</span><small>в открытом реестре по названию не найдено</small></div>`}
+    <div class="ct"><span>Руководитель</span><small>в открытых источниках нет (выписка ЕГР платная); спросите имя владельца при первом контакте</small></div>
+  </div></div>`;
+}
+
+// public copy of the demos (no messages, contacts or prices) lives on GitHub Pages
+const DEMO_BASE = "https://superbatman191-commits.github.io/brest/";
+// each org has its own folder (brest/<id>/) so messenger link previews show its name and photo
+const demoUrl = o => DEMO_BASE + o.i + "/";
+// demo opens are counted by a free keyless counter (abacus); ?me=1 once on the public site stops counting your own opens
+const CNT = "https://abacus.jasoncameron.dev";
+const store = (k, v) => { try { return v === undefined ? localStorage.getItem(k) : localStorage.setItem(k, v); } catch { return null; } };
+if (new URLSearchParams(location.search).has("me")) store("rbme", "1");
+function countOpen(o){
+  if (!location.hostname.endsWith("github.io") || store("rbme")) return;
+  try { if (sessionStorage.getItem("seen" + o.i)) return; sessionStorage.setItem("seen" + o.i, "1"); } catch {}
+  fetch(`${CNT}/hit/rbbrestdemo/d${o.i}`).catch(() => {});
+}
+async function renderStats(){
+  document.title = "Открытия демо";
+  app.innerHTML = `<div class="hub" style="display:block;max-width:720px"><h1 style="font-size:22px">Открытия демо</h1><p class="mute">Сколько раз открывали ссылку (без ваших открытий после ?me=1). Обновите страницу, чтобы пересчитать.</p><div id="stl" class="contacts">Загрузка…</div></div>`;
+  const rows = await Promise.all(DATA.filter(o => !o.closed).map(o => fetch(`${CNT}/get/rbbrestdemo/d${o.i}`).then(r => r.json()).then(j => [o, j.value || 0]).catch(() => [o, 0])));
+  rows.sort((a, b) => b[1] - a[1]);
+  document.getElementById("stl").innerHTML = rows.map(([o, n]) => `<div class="ct" style="grid-template-columns:1fr auto"><b>${esc(o.name)}</b><b class="num">${n}</b></div>`).join("");
+}
+const fill = (o, t) => (t||"").replace("{DEMO}", demoUrl(o));
+function msgText(o){ return fill(o, o.msg); }
+
+function renderHub(){
+  app.innerHTML = `<div class="hub"><aside class="rail"><h1>50 офферов: Брест без сайта</h1>
+    <p class="lead">Сообщение для первого контакта, аргументы и демо-сайт под каждую организацию. <a href="${DEMO_BASE}#stats" target="_blank" rel="noopener">Кто открывал демо</a> · <a href="#kit">Скрипты и возражения</a></p>
+    <div class="filters"><input id="q" placeholder="Поиск по названию" aria-label="Поиск"><select id="k" aria-label="Тип">
+    <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select><select id="sf" aria-label="Статус"><option value="">Любой статус</option><option value="w1">Волна 1</option>${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
+    <div class="list" id="list"></div></aside><main class="sheet" id="sheet"></main></div>`;
+  const list = document.getElementById("list"), q = document.getElementById("q"), k = document.getElementById("k"), sf = document.getElementById("sf");
+  const draw = () => {
+    const t = q.value.toLowerCase();
+    list.innerHTML = [...DATA].sort((a,b)=>a.closed-b.closed).filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value) && (!sf.value || (sf.value==="w1" ? !!o.wave : stOf(o)===sf.value)))
+      .map(o => `<button class="item${o.closed?" closed":""}" data-i="${o.i}" aria-current="${cur&&cur.i===o.i}">${o.avatar?`<img class="ava" src="${esc(o.avatar)}" alt="">`:`<span class="ava">${esc(o.name[0])}</span>`}
+      <span><b>${esc(o.name)}</b><small>${o.closed?"Закрыто · ":""}${o.wave?`Волна 1 (${o.wave}) · `:""}${esc((CAT[o.cat]||[,""])[1])} · ${o.price} BYN</small></span><span class="stars">${DB && stOf(o)!=="new" ? `<i class="dot st-${stOf(o)}" title="${STATUSES.find(x=>x[0]===stOf(o))[1]}"></i>` : stars(o.score)}</span></button>`).join("");
+  };
+  q.oninput = k.onchange = sf.onchange = draw;
+  list.onclick = e => { const b = e.target.closest(".item"); if (b) { location.hash = "o" + b.dataset.i; } };
+  draw(); window._draw = draw;
+}
+
+function renderSheet(o){
+  cur = o; window._draw && window._draw();
+  const ig = o.ig;
+  document.getElementById("sheet").innerHTML = `<header>${o.avatar?`<img src="${esc(o.avatar)}" alt="">`:""}<div style="min-width:0">
+    <h2>${esc(o.name)}</h2><div class="meta"><span class="chip">${esc((CAT[o.cat]||[,""])[1])}</span><span class="chip">${esc(o.addr)}</span>
+    ${ig?`<span class="chip"><a href="https://instagram.com/${esc(ig.h)}" target="_blank" rel="noopener">@${esc(ig.h)}</a>${ig.followers?` · ${esc(ig.followers)} подписчиков`:""}</span>`:`<span class="chip">Instagram не найден</span>`}
+    ${o.wave?`<span class="chip">Волна 1 · вариант ${o.wave}</span>`:""}
+    ${o.flag?`<span class="chip warn">${esc(o.flag)}</span>`:""}</div></div></header>
+    <div class="block"><h3>Статус</h3><div id="st" class="status"></div></div>
+    <div class="cols"><div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+      ${contactsBlock(o)}
+      ${(o.wave==="B" ? ["short","msg"] : ["msg","short"]).map((k,n) => !o[k] ? "" : `<${n?"details":"div"} class="block"${n?' style="border-top:1px solid var(--line);padding-top:10px"':""}>${n?"<summary>":"<h3>"}${k==="msg"?"Сообщение, вариант A (подробный)":"Сообщение, вариант B (короткий)"}${o.wave?(n?"":" · отправлять этот"):""}${n?"</summary>":"</h3>"}
+        <div class="msg" id="m-${k}">${esc(fill(o,o[k]))}</div>
+        <div class="row"><button class="btn" type="button" data-copy="${k}">Скопировать</button>${n?"":`<button class="btn ghost" id="copyd" type="button">Ссылка на демо</button>`}</div></${n?"details":"div"}>`).join("")}
+      ${o.fu3?`<details class="block" style="border-top:1px solid var(--line);padding-top:10px"><summary>Повтор, если нет ответа: 3-й день и 7-й день</summary>
+        <h3 style="margin-top:10px">3-й день</h3><div class="msg" id="m-fu3">${esc(fill(o,o.fu3))}</div><div class="row"><button class="btn" type="button" data-copy="fu3">Скопировать</button></div>
+        <h3 style="margin-top:14px">7-й день, последнее</h3><div class="msg" id="m-fu7">${esc(fill(o,o.fu7))}</div><div class="row"><button class="btn" type="button" data-copy="fu7">Скопировать</button></div></details>`:""}
+      <div class="block"><h3>Зачем им сайт</h3><ul class="why">${(o.why||[]).map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>
+      <div class="block"><h3>Что предлагаем</h3><div class="price">${esc(o.type)} · от <b>${o.price}</b> BYN · поддержка ${o.monthly} BYN/мес</div></div>
+    </div>
+    <div class="block" style="min-width:0"><h3>Демо-сайт</h3><div class="frame"><div class="bar"><i></i><i></i><i></i><span>${esc(o.slug||"")}.by</span></div>
+      <div class="viewport">${demo(o)}</div></div></div></div>`;
+  document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copy(fill(o, o[b.dataset.copy]), "Скопировано", document.getElementById("m-" + b.dataset.copy)));
+  document.getElementById("copyd").onclick = () => copy(demoUrl(o), "Ссылка скопирована", document.getElementById("m-msg"));
+  drawStatus(o);
+}
+
+function route(){
+  const h = location.hash.slice(1), id = +h.slice(1), o = DATA.find(x => x.i === id);
+  document.body.style.background = "";
+  if (h === "stats") { renderStats(); return; }
+  if (h === "kit") { renderKit(); return; }
+  if (h[0] === "d" && o) { document.title = o.name; app.innerHTML = demo(o); countOpen(o); document.body.style.background = (o.palette||["#faf7f2"])[0]; cur = null; return; }
+  if (!DATA.some(x => x.msg)) { app.innerHTML = `<p class="hub">Откройте ссылку на демо-сайт, которую вам прислали.</p>`; return; }
+  document.title = "Брест: 50 офферов";
+  if (!document.getElementById("sheet")) renderHub();
+  renderSheet(o || DATA[0]);
+}
+
+// demo forms and in-site buttons, shared by both views
+document.addEventListener("submit", e => { if (e.target.matches("[data-demo]")) { e.preventDefault(); e.target.querySelector(".ok").hidden = false; } });
+document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) b.closest(".site").querySelector(".s-book").scrollIntoView({behavior:"smooth",block:"center"}); });
+
+fetch("offers.json").then(r => r.json()).then(d => { DATA = d; addEventListener("hashchange", route); route(); initDb(); })
+  .catch(() => { app.innerHTML = `<p class="hub">Не удалось загрузить offers.json. Обновите страницу.</p>`; });
+</script>
