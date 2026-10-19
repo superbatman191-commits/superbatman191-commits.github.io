@@ -1,0 +1,29 @@
+1:"$Sreact.fragment"
+2:"/_next/static/chunks/3g1pfe0uepygy.js"
+3:I[39756,["$2"],"default"]
+4:I[37457,["$2"],"default"]
+5:I[39860,["$2"],"default"]
+6:I[49187,["$2"],"default"]
+d:I[97367,["$2"],"OutletBoundary"]
+e:"$Sreact.suspense"
+11:"ViewportBoundary"
+12:I[97367,["$2"],"$11"]
+13:"MetadataBoundary"
+14:I[97367,["$2"],"$13"]
+15:I[27201,["$2"],"IconMark"]
+:HL["/_next/static/chunks/2ufrn98q7vsaf.css","style"]
+8:X
+b:X
+b:C
+c:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","article",null,{"className":"wrap legal","children":[["$","a",null,{"href":"/","className":"back","children":"← На главную"}],["$","h1",null,{"children":"Страница не найдена"}],["$","p",null,{"children":"Такой страницы нет. Возможно, ссылка устарела."}],["$","ul",null,{"children":[["$","li",null,{"children":["$","a",null,{"href":"/","children":"Приёмка квартир в Бресте"}]}],["$","li",null,{"children":["$","a",null,{"href":"/zhk/","children":"ЖК Бреста"}]}],["$","li",null,{"children":["$","a",null,{"href":"/defekty/","children":"Дефекты новостроек и нормы РБ"}]}]]}]]}],null,["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]]}],"p":"$@10","v":null,"s":"$8"}}]]
+9:[["children",{"s":"/_not-found","h":96,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]]}],"p":"$@a","v":"$b","s":"$8"},"c":"$Qc"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/2ufrn98q7vsaf.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/3g1pfe0uepygy.js","async":true}]],["$","html",null,{"lang":"ru","className":"QFJh1G_variable _6r2oAq_variable","suppressHydrationWarning":true,"children":["$","body",null,{"children":[["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[["$","article",null,{"className":"wrap legal","children":[["$","a",null,{"href":"/","className":"back","children":"← На главную"}],["$","h1",null,{"children":"Страница не найдена"}],["$","p",null,{"children":"Такой страницы нет. Возможно, ссылка устарела."}],["$","ul",null,{"children":[["$","li",null,{"children":["$","a",null,{"href":"/","children":"Приёмка квартир в Бресте"}]}],["$","li",null,{"children":["$","a",null,{"href":"/zhk/","children":"ЖК Бреста"}]}],["$","li",null,{"children":["$","a",null,{"href":"/defekty/","children":"Дефекты новостроек и нормы РБ"}]}]]}]]}],[]]}],["$","$L5",null,{}],[["$","script",null,{"dangerouslySetInnerHTML":{"__html":"window.ymStart=function(){if(window.ym)return;\n(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();\nk=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})\n(window,document,'script','https://x.mc.invalid/metrika/tag.js','ym');\nym(000000000,'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});\ndocument.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;\nvar h=a.getAttribute('href'),g=/^tel:/.test(h)?'phone':/t\\.me\\//.test(h)?'telegram':/^viber:/.test(h)?'viber':'';\nif(g)ym(000000000,'reachGoal',g);},true);};\ntry{if(localStorage.getItem('cookie-consent')==='1')ymStart()}catch(e){}"}}],["$","$L6",null,{}]]]}]}]]}],"p":"$@7","v":null,"s":"$8"},"c":"$Q9"},"h":{"r":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L12",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#0b0c0e"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L14",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$e",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Страница не найдена | VERUM"}],["$","meta","1",{"name":"description","content":"Независимая приёмка квартир в новостройках Бреста и Брестской области. Проверка по нормам Республики Беларусь до подписания акта с застройщиком."}],["$","meta","2",{"property":"og:title","content":"Приёмка квартиры в Бресте: независимая проверка новостройки | VERUM"}],["$","meta","3",{"property":"og:description","content":"Независимая приёмка квартир в новостройках Бреста и Брестской области. Проверка по нормам Республики Беларусь до подписания акта с застройщиком."}],["$","meta","4",{"property":"og:site_name","content":"VERUM"}],["$","meta","5",{"property":"og:locale","content":"ru_RU"}],["$","meta","6",{"property":"og:image","content":"https://verum-demo.test/img/og.png"}],["$","meta","7",{"property":"og:image:width","content":"1200"}],["$","meta","8",{"property":"og:image:height","content":"630"}],["$","meta","9",{"property":"og:type","content":"website"}],["$","meta","10",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","11",{"name":"twitter:title","content":"Приёмка квартиры в Бресте: независимая проверка новостройки | VERUM"}],["$","meta","12",{"name":"twitter:description","content":"Независимая приёмка квартир в новостройках Бреста и Брестской области. Проверка по нормам Республики Беларусь до подписания акта с застройщиком."}],["$","meta","13",{"name":"twitter:image","content":"https://verum-demo.test/img/og.png"}],["$","link","14",{"rel":"icon","href":"/icon.svg?icon.1e0wco2lm8c-i.svg","sizes":"any","type":"image/svg+xml"}],["$","$L15","15",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@16","v":null,"s":"$8"}},"a":"$@17","u":"$@18","b":"c60386fc5c7ab72641fa"}
+f:null
+8:300
+18:true
+8:C
+17:0
+a:"$undefined"
+7:"$undefined"
+16:"$undefined"
+10:"$undefined"

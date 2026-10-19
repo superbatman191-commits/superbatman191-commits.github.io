@@ -1,0 +1,63 @@
+1:"$Sreact.fragment"
+2:"/_next/static/chunks/3g1pfe0uepygy.js"
+3:I[39756,["$2"],"default"]
+4:I[37457,["$2"],"default"]
+5:I[39860,["$2"],"default"]
+6:I[49187,["$2"],"default"]
+19:"ViewportBoundary"
+1a:I[97367,["$2"],"$19"]
+1b:"MetadataBoundary"
+1c:I[97367,["$2"],"$1b"]
+1d:"$Sreact.suspense"
+:HL["/_next/static/chunks/2ufrn98q7vsaf.css","style"]
+8:X
+b:X
+b:C
+f:T559,[{"@context":"https://schema.org","@type":"BlogPosting","headline":"Электрика, вентиляция, канализация: что спрятано за стенами","description":"Как проверить при приёмке квартиры заземление розеток, УЗО в щитке, тягу вентиляции и уклон канализации. Требования СН 4.04.01-2019, СН 3.02.01-2019 и СН 4.01.03-2019.","datePublished":"2026-10-15","dateModified":"2026-10-15","inLanguage":"ru","mainEntityOfPage":"https://verum-demo.test/blog/elektrika-ventilyaciya-kanalizaciya/","image":"https://verum-demo.test/img/og.png","author":{"@type":"Person","name":"Евгений Силюк","jobTitle":"Независимый инспектор приёмки квартир"},"publisher":{"@id":"https://verum-demo.test/#business"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Главная","item":"https://verum-demo.test/"},{"@type":"ListItem","position":2,"name":"Блог","item":"https://verum-demo.test/blog/"},{"@type":"ListItem","position":3,"name":"Электрика, вентиляция, канализация: что спрятано за стенами","item":"https://verum-demo.test/blog/elektrika-ventilyaciya-kanalizaciya/"}]}]10:T1679,<p>Кривую стену видно сразу. Розетку без заземления, вентиляцию, которая не тянет, или трубу канализации с обратным уклоном не видно вообще. Узнаёте вы о них, когда стиральная машина бьёт током, окна на кухне всю зиму мокрые, а в ванной стоит запах.</p>
+<p>Эти три системы я проверяю приборами, потому что на глаз тут не работает ничего.</p>
+<h2>Электрика</h2>
+<p>Розетки в квартире должны быть трёхпроводными: фаза, ноль и отдельный защитный проводник PE (СН 4.04.01-2019, п. 7.1.3). Ноль и защитный проводник подключаются раздельно, общий зажим для них запрещён (п. 16.1.9).</p>
+<p>Встречается, что провод PE в розетку заведён, но в щитке никуда не подключён. Розетка выглядит правильно, а заземления нет. Поэтому я проверяю каждую розетку тестером, а не смотрю на количество проводов.</p>
+<p>В щитке смотрю УЗО:</p>
+<ul><li>на вводе в квартиру устройство защитного отключения с током утечки до 300 мА, это защита от пожара (п. 16.3.5);</li><li>для линий в ванную и душевую УЗО на ток утечки до 30 мА (п. 16.3.13).</li></ul>
+<p>В ванной не должно быть выключателей (п. 7.4.3), и там выполняется дополнительное уравнивание потенциалов (п. 16.1.16).</p>
+<p>Что можно проверить самому: включить в каждую розетку зарядку или лампу, нажать кнопку «Тест» на каждом УЗО в щитке. Если УЗО не отключилось, это замечание в акт.</p>
+<h2>Вентиляция</h2>
+<p>Воздух из квартиры уходит через вытяжки на кухне и в санузлах, а комнаты отдают его туда через щели под дверями (СН 3.02.01-2019, п. 8.7). Минимальная вытяжка по приложению Г того же документа:</p>
+<div class="table"><table><thead><tr><th>Помещение</th><th>Вытяжка, не менее</th></tr></thead><tbody><tr><td>Кухня с электроплитой</td><td>60 м³/ч</td></tr><tr><td>Кухня с газовой плитой</td><td>60, 75 или 90 м³/ч на 2, 3 или 4 конфорки</td></tr><tr><td>Ванная или уборная</td><td>25 м³/ч</td></tr><tr><td>Совмещённый санузел</td><td>50 м³/ч</td></tr></tbody></table></div>
+<p>Старый способ с листком бумаги у решётки показывает только, что тяга есть. Сколько её, он не скажет. Я меряю анемометром скорость воздуха в решётке и пересчитываю в объём. При закрытых окнах и при открытой форточке, это два разных результата.</p>
+<p>Встречал и такое: вентотверстия нет вообще, решётку просто повесили на стену.</p>
+<p>Слабая вытяжка на кухне в новом доме почти всегда означает мусор в канале после строителей или неправильное подключение. Исправить это до заселения легко, после ремонта кухни уже нет.</p>
+<h2>Канализация</h2>
+<p>Горизонтальные трубы канализации должны идти с уклоном к стояку. Для труб диаметром до 50 мм это 3 %, больше 50 мм это 2 % (СН 4.01.03-2019, п. 18.2). На практике: 3 см перепада на каждый метр трубы.</p>
+<p>Обратный уклон, когда труба поднимается к стояку, встречается чаще, чем хотелось бы. Вода в такой трубе стоит, со временем образуется засор и появляется запах. Проверяю цифровым уклономером на каждом доступном участке.</p>
+<p>Заодно смотрю стояк: крепления, хомуты, нет ли следов протечек и ржавчины. В квартире на Карьерной хомуты на полипропиленовом стояке уже ржавели в новом доме.</p>
+<h2>Отопление</h2>
+<p>Радиаторы стоят ровно, крепления надёжные, краны работают. Если приёмка проходит в отопительный сезон, проверяю, что все радиаторы прогреваются равномерно, а тепловизором видно, где не греет.</p>
+<p>Типичные находки по инженерным системам с номерами пунктов есть на странице <a href="/defekty/">«Дефекты новостроек и нормы РБ»</a>.</p>e:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","article",null,{"className":"wrap legal post","children":[["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"$f"}}],["$","a",null,{"href":"/blog/","className":"back","children":"← Все статьи"}],["$","h1",null,{"children":"Электрика, вентиляция, канализация: что спрятано за стенами"}],["$","p",null,{"className":"post-meta","children":["Евгений, независимый инспектор приёмки · ",["$","time",null,{"dateTime":"2026-10-15","children":"15.10.2026"}]]}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$10"}}],"$L11","$L12","$L13","$L14","$L15","$L16"]}],null,"$L17"]}],"p":"$@18","v":null,"s":"$8"}}]]
+c:[["children",{"s":{"n":"slug","t":"d","k":"elektrika-ventilyaciya-kanalizaciya","s":[]},"h":65632,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]]}],"p":"$@d","v":"$b","s":"$8"},"c":"$Qe"}]]
+9:[["children",{"s":"blog","h":131168,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]]}],"p":"$@a","v":"$b","s":"$8"},"c":"$Qc"}]]
+0:{"t":{"t":{"s":"","h":131152,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/2ufrn98q7vsaf.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/3g1pfe0uepygy.js","async":true}]],["$","html",null,{"lang":"ru","className":"QFJh1G_variable _6r2oAq_variable","suppressHydrationWarning":true,"children":["$","body",null,{"children":[["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[["$","article",null,{"className":"wrap legal","children":[["$","a",null,{"href":"/","className":"back","children":"← На главную"}],["$","h1",null,{"children":"Страница не найдена"}],["$","p",null,{"children":"Такой страницы нет. Возможно, ссылка устарела."}],["$","ul",null,{"children":[["$","li",null,{"children":["$","a",null,{"href":"/","children":"Приёмка квартир в Бресте"}]}],["$","li",null,{"children":["$","a",null,{"href":"/zhk/","children":"ЖК Бреста"}]}],["$","li",null,{"children":["$","a",null,{"href":"/defekty/","children":"Дефекты новостроек и нормы РБ"}]}]]}]]}],[]]}],["$","$L5",null,{}],[["$","script",null,{"dangerouslySetInnerHTML":{"__html":"window.ymStart=function(){if(window.ym)return;\n(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();\nk=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})\n(window,document,'script','https://x.mc.invalid/metrika/tag.js','ym');\nym(000000000,'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});\ndocument.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;\nvar h=a.getAttribute('href'),g=/^tel:/.test(h)?'phone':/t\\.me\\//.test(h)?'telegram':/^viber:/.test(h)?'viber':'';\nif(g)ym(000000000,'reachGoal',g);},true);};\ntry{if(localStorage.getItem('cookie-consent')==='1')ymStart()}catch(e){}"}}],["$","$L6",null,{}]]]}]}]]}],"p":"$@7","v":null,"s":"$8"},"c":"$Q9"},"h":{"r":["$","$1","h",{"children":[null,["$","$L1a",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#0b0c0e"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","$L1c",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$1d",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Электрика, вентиляция и канализация при приёмке квартиры: нормы РБ | VERUM"}],["$","meta","1",{"name":"description","content":"Как проверить при приёмке квартиры заземление розеток, УЗО в щитке, тягу вентиляции и уклон канализации. Требования СН 4.04.01-2019, СН 3.02.01-2019 и СН 4.01.03-2019."}],["$","link","2",{"rel":"canonical","href":"https://verum-demo.test/blog/elektrika-ventilyaciya-kanalizaciya/"}],["$","meta","3",{"property":"og:title","content":"Электрика, вентиляция и канализация при приёмке квартиры: нормы РБ | VERUM"}],["$","meta","4",{"property":"og:description","content":"Как проверить при приёмке квартиры заземление розеток, УЗО в щитке, тягу вентиляции и уклон канализации. Требования СН 4.04.01-2019, СН 3.02.01-2019 и СН 4.01.03-2019."}],["$","meta","5",{"property":"og:site_name","content":"VERUM"}],["$","meta","6",{"property":"og:locale","content":"ru_RU"}],["$","meta","7",{"property":"og:image","content":"https://verum-demo.test/img/og.png"}],["$","meta","8",{"property":"og:image:width","content":"1200"}],["$","meta","9",{"property":"og:image:height","content":"630"}],["$","meta","10",{"property":"og:type","content":"article"}],["$","meta","11",{"property":"article:published_time","content":"2026-10-15"}],["$","meta","12",{"property":"article:modified_time","content":"2026-10-15"}],["$","meta","13",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","14",{"name":"twitter:title","content":"Электрика, вентиляция и канализация при приёмке квартиры: нормы РБ | VERUM"}],["$","meta","15",{"name":"twitter:description","content":"Как проверить при приёмке квартиры заземление розеток, УЗО в щитке, тягу вентиляции и уклон канализации. Требования СН 4.04.01-2019, СН 3.02.01-2019 и СН 4.01.03-2019."}],"$L1e","$L1f","$L20"]}]}],null]}],"$L21"]}],"p":"$@22","v":null,"s":"$8"}},"a":"$@23","u":"$@24","b":"c60386fc5c7ab72641fa"}
+25:I[97367,["$2"],"OutletBoundary"]
+27:I[27201,["$2"],"IconMark"]
+11:["$","h2",null,{"children":"Записаться на приёмку"}]
+12:["$","p",null,{"children":["Работаю в Бресте и Брестской области. Цены зависят от площади и типа приёмки: ",["$","a",null,{"href":"/ceny/","children":"прайс и калькулятор"}],"."]}]
+13:["$","p",null,{"style":{"marginTop":24},"children":["$","a",null,{"href":"/#book","className":"btn btn-primary","children":["Записаться на приёмку ",["$","i",null,{"className":"ph ph-arrow-right"}]]}]}]
+14:["$","p",null,{"children":["Или позвоните: ",["$","a",null,{"href":"tel:+375290000000","children":"+375 29 000-00-00"}]]}]
+15:["$","h2",null,{"children":"Ещё статьи"}]
+16:["$","ul",null,{"children":[["$","li","dopuski-sten-i-polov-sp-1-03-01-2019",{"children":["$","a",null,{"href":"/blog/dopuski-sten-i-polov-sp-1-03-01-2019/","children":"Ровные стены и пол: какие допуски даёт СП 1.03.01-2019"}]}],["$","li","kak-prinyat-kvartiru-v-novostrojke",{"children":["$","a",null,{"href":"/blog/kak-prinyat-kvartiru-v-novostrojke/","children":"Как принять квартиру в новостройке и не подписать лишнего"}]}],["$","li","proverka-okon-pri-priemke",{"children":["$","a",null,{"href":"/blog/proverka-okon-pri-priemke/","children":"Окна в новостройке: что проверить до подписания акта"}]}],["$","li","samostoyatelno-ili-so-specialistom",{"children":["$","a",null,{"href":"/blog/samostoyatelno-ili-so-specialistom/","children":"Принять квартиру самому или позвать специалиста"}]}]]}]
+17:["$","$L25",null,{"children":["$","$1d",null,{"name":"Next.MetadataOutlet","children":"$@26"}]}]
+1e:["$","meta","16",{"name":"twitter:image","content":"https://verum-demo.test/img/og.png"}]
+1f:["$","link","17",{"rel":"icon","href":"/icon.svg?icon.1e0wco2lm8c-i.svg","sizes":"any","type":"image/svg+xml"}]
+20:["$","$L27","18",{}]
+21:["$","meta",null,{"name":"next-size-adjust","content":""}]
+8:300
+26:null
+24:true
+8:C
+23:0
+d:"$undefined"
+a:"$undefined"
+7:"$undefined"
+22:"$undefined"
+18:"$undefined"
