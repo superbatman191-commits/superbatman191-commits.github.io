@@ -69,11 +69,23 @@ button,input,select,textarea{font:inherit;color:inherit}
 .frame .viewport{height:640px;overflow:auto}
 .contacts{display:flex;flex-direction:column;gap:6px;font-size:14px}
 .contacts .how{margin:0 0 4px;font-weight:600}
+.contacts .how.warn{color:var(--warn)}
+.item.closed{opacity:.5}
+.ct .row{grid-column:2;margin:0}
+.ct .btn{color:var(--accent-ink);text-decoration:none;padding:5px 12px}
 .ct{display:grid;grid-template-columns:96px 1fr;gap:2px 10px;align-items:baseline;padding-block:5px;border-bottom:1px solid var(--line)}
 .ct>span{color:var(--mute);font-size:12px;grid-row:span 3}
 .ct small{color:var(--mute);font-size:12px;grid-column:2}
 .ct a{color:var(--accent);grid-column:2;width:max-content}
 .ct .num{font-variant-numeric:tabular-nums;user-select:all}
+.status{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.note{flex:1 1 220px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.mute{color:var(--mute);font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--mute)}
+.dot.st-sent{background:#3d7fd6}.dot.st-replied{background:#d6a23d}.dot.st-deal{background:#3dae6b}.dot.st-refused{background:#c4513f}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px}
 @media (max-width:980px){.cols{grid-template-columns:1fr}}
 @media (max-width:760px){.hub{grid-template-columns:1fr}.list{max-height:280px}.sheet{padding:16px}}
@@ -181,21 +193,50 @@ function demo(o){
 }
 
 let DATA = [], cur = null;
+// reply statuses live in the artifact db (collection "status", one doc per org id); absent outside the claude.ai viewer
+const STATUSES = [["new","Новый"],["sent","Написал"],["replied","Ответили"],["deal","Договорились"],["refused","Отказ"]];
+let ST = {}, DB = null;
+const stOf = o => (ST[o.i] && ST[o.i].s) || "new";
+async function initDb(){
+  DB = window.claude?.use ? await window.claude.use("db").catch(() => null) : null;
+  if (!DB) return;
+  DB.collection("status").onSnapshot(snap => {
+    ST = {}; snap.docs.forEach(d => { if (d.exists) ST[d.id] = d.data(); });
+    window._draw && window._draw(); if (cur) drawStatus(cur);
+  }, () => {});
+  if (cur) drawStatus(cur);
+}
+function drawStatus(o){
+  const box = document.getElementById("st"); if (!box) return;
+  if (!DB) { box.innerHTML = `<small class="mute">Статусы сохраняются в опубликованной версии страницы на claude.ai.</small>`; return; }
+  const s = stOf(o), note = (ST[o.i] && ST[o.i].note) || "", at = ST[o.i] && ST[o.i].at;
+  box.innerHTML = `<div class="seg" role="group" aria-label="Статус">${STATUSES.map(([v,l]) => `<button type="button" data-st="${v}" aria-pressed="${s===v}" class="st-${v}">${l}</button>`).join("")}</div>
+    <input id="note-${o.i}" class="note" placeholder="Заметка: кто ответил, когда перезвонить" value="${esc(note)}">
+    ${at ? `<small class="mute">Обновлено ${new Date(at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small>` : ""}`;
+  const save = (patch) => DB.collection("status").doc(String(o.i)).set({ s: stOf(o), note: (ST[o.i] && ST[o.i].note) || "", ...patch, at: new Date().toISOString() })
+    .catch(e => toast(e && e.code === "permission_denied" ? "Нет прав на запись" : "Не сохранилось, попробуйте ещё раз"));
+  box.querySelector(".seg").onclick = e => { const b = e.target.closest("[data-st]"); if (b && b.dataset.st !== s) save({ s: b.dataset.st }); };
+  const n = box.querySelector(".note"); n.onchange = () => { if (n.value !== note) save({ note: n.value.slice(0, 500) }); };
+}
 const app = document.getElementById("app");
 const toast = t => { const d = document.createElement("div"); d.className="toast"; d.textContent=t; document.body.append(d); setTimeout(()=>d.remove(),1800); };
 const stars = n => "★".repeat(n) + "☆".repeat(5-n);
 
 // where to write: Instagram DM first (the message mentions their profile), then mobile (Viber/Telegram/WhatsApp), landline = call
 function contactsBlock(o){
-  const c = o.contacts || {}, ph = c.phones || [], lg = c.legal;
+  const c = o.contacts || {}, ph = c.phones || [], lg = c.legal, ms = c.messengers || [], y = c.yandex;
   const mob = ph.find(p => p.mobile);
-  const how = c.instagram ? "Написать в директ Instagram, параллельно в Viber на мобильный"
-    : mob ? "Написать в Viber или Telegram на мобильный" : ph.length ? "Позвонить, попросить контакт владельца" : "Зайти лично, контактов в открытом доступе нет";
+  const how = o.closed ? "Не писать: на Яндекс Картах организация отмечена как закрытая"
+    : ms.length ? `Написать в ${ms[0].t}: мессенджер указан самой организацией`
+    : c.instagram ? "Написать в директ Instagram"
+    : mob ? "Позвонить на мобильный; мессенджеры на этом номере не подтверждены"
+    : ph.length ? "Позвонить, попросить контакт владельца" : "Зайти лично, контактов в открытом доступе нет";
   return `<div class="block"><h3>Куда писать</h3><div class="contacts">
-    <p class="how">${how}</p>
+    <p class="how${o.closed?" warn":""}">${how}</p>
+    ${ms.length ? `<div class="ct"><span>Мессенджеры</span><div class="row">${ms.map(m => `<a class="btn" href="${esc(m.u)}" target="_blank" rel="noopener">${esc(m.t)}</a>`).join("")}</div><small>из карточки на Яндекс Картах</small></div>` : ""}
     ${c.instagram ? `<div class="ct"><span>Instagram</span><a href="${esc(c.instagram)}" target="_blank" rel="noopener">${esc(c.instagram.replace("https://",""))}</a></div>` : ""}
-    ${ph.map(p => `<div class="ct"><span>${p.mobile ? "Мобильный" : "Городской"}</span><b class="num">${esc(p.n)}</b><small>${esc(p.src)}</small>${p.mobile ? `<a href="https://wa.me/${p.raw}" target="_blank" rel="noopener">WhatsApp</a>` : ""}</div>`).join("")}
-    ${c.messengers ? `<div class="ct"><span>Мессенджер</span>${esc(c.messengers)}</div>` : ""}
+    ${ph.map(p => `<div class="ct"><span>${p.mobile ? "Мобильный" : "Городской"}</span><b class="num">${esc(p.n)}</b><small>${esc(p.src)}</small></div>`).join("")}
+    ${y && (y.rating || y.note) ? `<div class="ct"><span>Яндекс Карты</span>${y.rating ? `<b>★ ${esc(y.rating.replace(".",","))}</b><small>${y.votes} оценок</small>` : ""}${y.note ? `<small>${esc(y.note)}</small>` : ""}</div>` : ""}
     ${lg ? `<div class="ct"><span>Юрлицо</span><b>${esc(lg.name)}</b><small>УНП ${esc(lg.unp)} · ${esc(lg.status)}${lg.liq ? " · " + esc(lg.liq) : ""} · реестр МНС</small></div>` : `<div class="ct"><span>Юрлицо</span><small>в открытом реестре по названию не найдено</small></div>`}
     <div class="ct"><span>Руководитель</span><small>в открытых источниках нет (выписка ЕГР платная); спросите имя владельца при первом контакте</small></div>
   </div></div>`;
@@ -210,16 +251,16 @@ function renderHub(){
   app.innerHTML = `<div class="hub"><aside class="rail"><h1>50 офферов: Брест без сайта</h1>
     <p class="lead">Сообщение для первого контакта, аргументы и демо-сайт под каждую организацию. Демо по ссылке #d&lt;id&gt; открывается отдельно, без этой панели.</p>
     <div class="filters"><input id="q" placeholder="Поиск по названию" aria-label="Поиск"><select id="k" aria-label="Тип">
-    <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select></div>
+    <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select><select id="sf" aria-label="Статус"><option value="">Любой статус</option>${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
     <div class="list" id="list"></div></aside><main class="sheet" id="sheet"></main></div>`;
-  const list = document.getElementById("list"), q = document.getElementById("q"), k = document.getElementById("k");
+  const list = document.getElementById("list"), q = document.getElementById("q"), k = document.getElementById("k"), sf = document.getElementById("sf");
   const draw = () => {
     const t = q.value.toLowerCase();
-    list.innerHTML = DATA.filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value))
-      .map(o => `<button class="item" data-i="${o.i}" aria-current="${cur&&cur.i===o.i}">${o.avatar?`<img class="ava" src="${esc(o.avatar)}" alt="">`:`<span class="ava">${esc(o.name[0])}</span>`}
-      <span><b>${esc(o.name)}</b><small>${esc((CAT[o.cat]||[,""])[1])} · ${o.price} BYN</small></span><span class="stars">${stars(o.score)}</span></button>`).join("");
+    list.innerHTML = [...DATA].sort((a,b)=>a.closed-b.closed).filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value) && (!sf.value || stOf(o)===sf.value))
+      .map(o => `<button class="item${o.closed?" closed":""}" data-i="${o.i}" aria-current="${cur&&cur.i===o.i}">${o.avatar?`<img class="ava" src="${esc(o.avatar)}" alt="">`:`<span class="ava">${esc(o.name[0])}</span>`}
+      <span><b>${esc(o.name)}</b><small>${o.closed?"Закрыто · ":""}${esc((CAT[o.cat]||[,""])[1])} · ${o.price} BYN</small></span><span class="stars">${DB && stOf(o)!=="new" ? `<i class="dot st-${stOf(o)}" title="${STATUSES.find(x=>x[0]===stOf(o))[1]}"></i>` : stars(o.score)}</span></button>`).join("");
   };
-  q.oninput = k.onchange = draw;
+  q.oninput = k.onchange = sf.onchange = draw;
   list.onclick = e => { const b = e.target.closest(".item"); if (b) { location.hash = "o" + b.dataset.i; } };
   draw(); window._draw = draw;
 }
@@ -231,6 +272,7 @@ function renderSheet(o){
     <h2>${esc(o.name)}</h2><div class="meta"><span class="chip">${esc((CAT[o.cat]||[,""])[1])}</span><span class="chip">${esc(o.addr)}</span>
     ${ig?`<span class="chip"><a href="https://instagram.com/${esc(ig.h)}" target="_blank" rel="noopener">@${esc(ig.h)}</a>${ig.followers?` · ${esc(ig.followers)} подписчиков`:""}</span>`:`<span class="chip">Instagram не найден</span>`}
     ${o.flag?`<span class="chip warn">${esc(o.flag)}</span>`:""}</div></div></header>
+    <div class="block"><h3>Статус</h3><div id="st" class="status"></div></div>
     <div class="cols"><div style="display:flex;flex-direction:column;gap:18px;min-width:0">
       ${contactsBlock(o)}
       <div class="block"><h3>Сообщение</h3><div class="msg" id="msg">${esc(msgText(o))}</div>
@@ -243,6 +285,7 @@ function renderSheet(o){
   const copy = (t, done) => navigator.clipboard.writeText(t).then(()=>toast(done)).catch(()=>{ const r=document.createRange(); r.selectNodeContents(document.getElementById("msg")); getSelection().removeAllRanges(); getSelection().addRange(r); toast("Выделено, нажмите Ctrl+C"); });
   document.getElementById("copy").onclick = () => copy(msgText(o), "Сообщение скопировано");
   document.getElementById("copyd").onclick = () => copy(demoUrl(o), "Ссылка скопирована");
+  drawStatus(o);
 }
 
 function route(){
@@ -258,6 +301,6 @@ function route(){
 document.addEventListener("submit", e => { if (e.target.matches("[data-demo]")) { e.preventDefault(); e.target.querySelector(".ok").hidden = false; } });
 document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) b.closest(".site").querySelector(".s-book").scrollIntoView({behavior:"smooth",block:"center"}); });
 
-fetch("offers.json").then(r => r.json()).then(d => { DATA = d; addEventListener("hashchange", route); route(); })
+fetch("offers.json").then(r => r.json()).then(d => { DATA = d; addEventListener("hashchange", route); route(); initDb(); })
   .catch(() => { app.innerHTML = `<p class="hub">Не удалось загрузить offers.json. Обновите страницу.</p>`; });
 </script>
