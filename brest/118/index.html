@@ -7,6 +7,8 @@
 <meta property="og:title" content="Форт 9: демо-сайт">
 <meta property="og:description" content="Ремонт авто без лишних вопросов">
 <meta property="og:url" content="https://superbatman191-commits.github.io/brest/118/">
+<meta property="og:image" content="https://superbatman191-commits.github.io/brest/ig/118/y6.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <script>if(!location.hash)history.replaceState(null,"",location.pathname+location.search+"#d118")</script>
 <meta name="robots" content="noindex, nofollow">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -390,6 +392,13 @@ function countOpen(o){
   if (!location.hostname.endsWith("github.io") || store("rbme")) return;
   try { if (sessionStorage.getItem("seen" + o.i)) return; sessionStorage.setItem("seen" + o.i, "1"); } catch {}
   fetch(`${CNT}/hit/rbbrestdemo/d${o.i}`).catch(() => {});
+  notify(`Открыли демо: ${o.name}`, "eyes");
+}
+// push to the owner's phone via ntfy.sh (free, no account): subscribe to this topic in the ntfy app
+const NTFY = "https://ntfy.sh/rbdemo-33e5cd7dad43";
+function notify(text, tag){
+  if (!location.hostname.endsWith("github.io") || store("rbme")) return;
+  fetch(NTFY, { method: "POST", body: text, headers: { Tags: tag } }).catch(() => {});
 }
 async function renderStats(){
   document.title = "Открытия демо";
@@ -419,6 +428,14 @@ function renderHub(){
   draw(); window._draw = draw;
 }
 
+// who a client sees first when searching this niche on Yandex Maps in Brest (contacts/competitors.json)
+function compBlock(o){
+  const c = o.comp; if (!c || o.closed) return "";
+  return `<div class="block"><h3>Конкуренты в поиске</h3>
+    <p class="mute">Яндекс Карты, «${esc(c.q)}» в Бресте: ${c.pos?`вы на ${c.pos} месте, `:"вас нет среди первых результатов, "}свой сайт у ${c.withSite} из первых ${c.total}.${c.note?` <b>${esc(c.note)}.</b>`:""}</p>
+    ${c.top.length?`<div class="contacts">${c.top.map(t=>`<div class="ct" style="grid-template-columns:1fr auto"><span>${esc(t.n)} · <a href="https://${esc(t.site)}" target="_blank" rel="noopener">${esc(t.site)}</a></span><span class="mute">${t.r?`★ ${t.r} · ${t.v}`:""}</span></div>`).join("")}</div>`:""}
+    ${c.line?`<div class="msg" id="m-cline" style="margin-top:10px">${esc(c.line)}</div><div class="row"><button class="btn" type="button" id="ccopy">Скопировать фразу</button></div>`:""}</div>`;
+}
 function renderSheet(o){
   cur = o; window._draw && window._draw();
   const ig = o.ig;
@@ -430,6 +447,7 @@ function renderSheet(o){
     <div class="block"><h3>Статус</h3><div id="st" class="status"></div></div>
     <div class="cols"><div style="display:flex;flex-direction:column;gap:18px;min-width:0">
       ${contactsBlock(o)}
+      ${compBlock(o)}
       ${(o.wave==="B" ? ["short","msg"] : ["msg","short"]).map((k,n) => !o[k] ? "" : `<${n?"details":"div"} class="block"${n?' style="border-top:1px solid var(--line);padding-top:10px"':""}>${n?"<summary>":"<h3>"}${k==="msg"?"Сообщение, вариант A (подробный)":"Сообщение, вариант B (короткий)"}${o.wave?(n?"":" · отправлять этот"):""}${n?"</summary>":"</h3>"}
         <div class="msg" id="m-${k}">${esc(fill(o,o[k]))}</div>
         <div class="row"><button class="btn" type="button" data-copy="${k}">Скопировать</button>${n?"":`<button class="btn ghost" id="copyd" type="button">Ссылка на демо</button>`}</div></${n?"details":"div"}>`).join("")}
@@ -445,6 +463,7 @@ function renderSheet(o){
     <div class="block" style="min-width:0"><h3>Демо-сайт</h3><div class="frame"><div class="bar"><i></i><i></i><i></i><span>${esc(o.slug||"")}.by</span></div>
       <div class="viewport">${demo(o)}</div></div></div></div>`;
   document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copy(fill(o, o[b.dataset.copy]), "Скопировано", document.getElementById("m-" + b.dataset.copy)));
+  const cc = document.getElementById("ccopy"); if (cc) cc.onclick = () => copy(o.comp.line, "Скопировано", document.getElementById("m-cline"));
   document.getElementById("copyd").onclick = () => copy(demoUrl(o), "Ссылка скопирована", document.getElementById("m-msg"));
   drawStatus(o);
   // saving a file goes through the viewer's downloads capability; without it only "Открыть" stays
@@ -469,7 +488,11 @@ function route(){
 }
 
 // demo forms and in-site buttons, shared by both views
-document.addEventListener("submit", e => { if (e.target.matches("[data-demo]")) { e.preventDefault(); e.target.querySelector(".ok").hidden = false; } });
+document.addEventListener("submit", e => { if (e.target.matches("[data-demo]")) { e.preventDefault(); e.target.querySelector(".ok").hidden = false;
+  const o = DATA.find(x => location.hash === "#d" + x.i), v = [...e.target.querySelectorAll("input")].map(i => `${i.placeholder}: ${i.value.trim() || "—"}`).join("
+");
+  if (o) notify(`Заявка из демо: ${o.name}
+${v}`, "bell"); } });
 document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) b.closest(".site").querySelector(".s-book").scrollIntoView({behavior:"smooth",block:"center"}); });
 
 fetch("offers.json").then(r => r.json()).then(d => { DATA = d; addEventListener("hashchange", route); route(); initDb(); })
