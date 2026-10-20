@@ -92,6 +92,10 @@ button,input,select,textarea{font:inherit;color:inherit}
 details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
 .shot{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:start}.shot img{width:120px;border-radius:10px;border:1px solid var(--line)}.shot p{margin:0}
 .shot .btn{text-decoration:none}
+.act{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.act .btn{padding:10px 18px}
+.item.sel{box-shadow:0 0 0 2px var(--accent);background:var(--panel)}
+.bulk{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:13px}
+.bulk[hidden]{display:none}.bulk select{padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}.bulk .btn{padding:6px 12px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px}
 @media (max-width:980px){.cols{grid-template-columns:1fr}}
 @media (max-width:760px){.hub{grid-template-columns:1fr}.list{max-height:280px}.sheet{padding:16px}}
@@ -364,15 +368,16 @@ async function renderToday(){
   const card = ([o, k, d]) => `<div class="block" style="border-bottom:1px solid var(--line);padding-bottom:14px">
     <h3>${esc(o.name)} · ${esc(o.city || "Брест")} · ${d} дн. назад · демо открывали: ${opens[o.i]}</h3>
     <div class="msg" id="m-t${o.i}">${esc(fill(o, o[k]))}</div>
-    <div class="row"><button class="btn" type="button" data-tc="${o.i}" data-k="${k}">Скопировать ${k === "fu3" ? "повтор 3-го дня" : "последнее сообщение"}</button>
-    <button class="btn ghost" type="button" data-td="${o.i}" data-k="${k}">Отправил</button><a class="btn ghost" href="#o${o.i}">Открыть</a></div></div>`;
+    <div class="row"><button class="btn" type="button" data-ts="${o.i}" data-k="${k}">Отправить ${k === "fu3" ? "повтор 3-го дня" : "последнее сообщение"}${channel(o) ? ` · ${esc(channel(o).t)}` : ""}</button>
+    <button class="btn ghost" type="button" data-td="${o.i}" data-k="${k}">Уже отправил</button>${k === "fu7" ? `<button class="btn ghost" type="button" data-tr="${o.i}">Отказ</button>` : ""}<a class="btn ghost" href="#o${o.i}">Открыть</a></div></div>`;
   box.innerHTML = `${due.length ? due.map(card).join("") : `<p class="mute">Повторов на сегодня нет.</p>`}
     <h3 style="margin-top:18px">Ответили, ждут вашего ответа</h3>${replied.length ? replied.map(o => `<div class="ct" style="grid-template-columns:1fr auto"><a href="#o${o.i}">${esc(o.name)} · ${esc(o.city || "Брест")}</a><small>${esc((ST[o.i].note || "").slice(0, 80))}</small></div>`).join("") : `<p class="mute">Пока никого.</p>`}
     <h3 style="margin-top:18px">Написали, ждём ответа (${sent.length})</h3>${sent.map(o => `<div class="ct" style="grid-template-columns:1fr auto"><a href="#o${o.i}">${esc(o.name)} · ${esc(o.city || "Брест")}</a><small>открывали демо: ${opens[o.i]}</small></div>`).join("")}`;
   box.onclick = e => {
-    const c = e.target.closest("[data-tc]"), t = e.target.closest("[data-td]");
-    if (c) { const o = DATA.find(x => x.i === +c.dataset.tc); copy(fill(o, o[c.dataset.k]), "Скопировано", document.getElementById("m-t" + o.i)); }
+    const c = e.target.closest("[data-ts]"), t = e.target.closest("[data-td]"), r = e.target.closest("[data-tr]");
+    if (c) { const o = DATA.find(x => x.i === +c.dataset.ts); sendOut(o, c.dataset.k).then(() => renderToday()); }
     if (t) { const o = DATA.find(x => x.i === +t.dataset.td); saveSt(o, { [t.dataset.k]: new Date().toISOString() }).then(() => renderToday()); }
+    if (r) { const o = DATA.find(x => x.i === +r.dataset.tr); saveSt(o, { s: "refused" }).then(() => renderToday()); }
   };
 }
 function drawStatus(o){
@@ -399,6 +404,36 @@ async function renderKit(){
   box.onclick = e => { const p = e.target.closest("p"); if (!p || !p.querySelector("b")) return; const t = p.innerText.replace(/^Вариант \d+:\s*/, "").trim(); copy(t, "Ответ скопирован", p); };
 }
 const stars = n => "★".repeat(n) + "☆".repeat(5-n);
+
+// one-click send: copy the text, open the chat (WhatsApp gets the text prefilled), save the picture, mark the status
+function channel(o){
+  const c = o.contacts || {}, m = (c.messengers || [])[0], mob = (c.phones || []).find(p => p.mobile);
+  if (m) return { t: m.t, u: m.t === "WhatsApp" ? m.u.split("?")[0] : m.u, wa: m.t === "WhatsApp" };
+  if (c.instagram) return { t: "Instagram", u: "https://ig.me/m/" + c.instagram.replace(/\/+$/, "").split("/").pop() };
+  if (mob) return { t: "Viber, не проверен", u: "https://viber.click/" + mob.raw };
+  return null;
+}
+const firstKey = o => o.wave === "B" && o.short ? "short" : "msg";
+function openTab(u){ const a = document.createElement("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; document.body.append(a); a.click(); a.remove(); }
+async function saveShot(o){
+  const d = await DLS(); if (!d) { openTab(`shots/${o.i}.jpg`); return; }
+  try { const blob = await fetch(`shots/${o.i}.jpg`).then(r => r.blob()); await d.save({ filename: `demo-${o.slug || o.i}.jpg`, data: blob }); }
+  catch (e) { if (e && e.code !== "declined") toast("Картинка не сохранилась, нажмите «Открыть»"); }
+}
+// k: "msg"/"short" = first contact (status "Написал" + picture), "fu3"/"fu7" = follow-up (marks that follow-up done)
+async function sendOut(o, k){
+  const ch = channel(o), text = fill(o, o[k]);
+  copy(text, ch ? `Текст скопирован, открываю ${ch.t}` : "Текст скопирован: контакта для сообщений нет, позвоните");
+  if (ch) openTab(ch.wa ? ch.u + "?text=" + encodeURIComponent(text) : ch.u);
+  if (k === "msg" || k === "short") { if (DB && stOf(o) === "new") await saveSt(o, { s: "sent", ch: ch ? ch.t : "" }); await saveShot(o); }
+  else if (DB) await saveSt(o, { [k]: new Date().toISOString() });
+}
+// queue: the next org in the list as currently filtered that nobody has written to yet
+function nextNew(){
+  const l = (window._list || DATA).filter(o => !o.closed), k = cur ? l.findIndex(o => o.i === cur.i) : -1;
+  const n = [...l.slice(k + 1), ...l.slice(0, k + 1)].find(o => stOf(o) === "new" && o.i !== cur?.i);
+  if (n) location.hash = "o" + n.i; else toast("Новых в этом списке не осталось");
+}
 
 // where to write: Instagram DM first (the message mentions their profile), then mobile (Viber/Telegram/WhatsApp), landline = call
 function contactsBlock(o){
@@ -455,18 +490,44 @@ function renderHub(){
     <p class="lead">Сообщение для первого контакта, аргументы и демо-сайт под каждую организацию. <a href="${DEMO_BASE}#stats" target="_blank" rel="noopener">Кто открывал демо</a> · <a href="#kit">Скрипты и возражения</a> · <a href="#today"><b>Сегодня</b></a></p>
     <div class="filters"><input id="q" placeholder="Поиск по названию" aria-label="Поиск"><select id="k" aria-label="Тип">
     <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select><select id="ci" aria-label="Город"><option value="">Все города</option>${[...new Set(DATA.map(o=>o.city||"Брест"))].map(c=>`<option>${esc(c)}</option>`).join("")}</select><select id="sf" aria-label="Статус"><option value="">Любой статус</option><option value="w1">Волна 1</option>${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
+    <div class="row" style="margin:0"><button class="btn ghost" type="button" id="selb" aria-pressed="false">Выбрать несколько</button></div>
+    <div class="bulk" id="bulk" hidden><b id="bn">0</b> выбрано
+      <select id="bs" aria-label="Новый статус">${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select><button class="btn" type="button" id="ba">Поставить статус</button>
+      <button class="btn ghost" type="button" id="ball">Все в списке</button><button class="btn ghost" type="button" id="bcsv">Скачать CSV</button></div>
     <div class="list" id="list"></div></aside><main class="sheet" id="sheet"></main></div>`;
   const ci = document.getElementById("ci"), list = document.getElementById("list"), q = document.getElementById("q"), k = document.getElementById("k"), sf = document.getElementById("sf");
   const draw = () => {
     const t = q.value.toLowerCase();
-    list.innerHTML = [...DATA].sort((a,b)=>a.closed-b.closed).filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value) && (!ci.value || (o.city||"Брест")===ci.value) && (!sf.value || (sf.value==="w1" ? !!o.wave : stOf(o)===sf.value)))
-      .map(o => `<button class="item${o.closed?" closed":""}" data-i="${o.i}" aria-current="${cur&&cur.i===o.i}">${o.avatar?`<img class="ava" src="${esc(o.avatar)}" alt="">`:`<span class="ava">${esc(o.name[0])}</span>`}
+    window._list = [...DATA].sort((a,b)=>a.closed-b.closed).filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value) && (!ci.value || (o.city||"Брест")===ci.value) && (!sf.value || (sf.value==="w1" ? !!o.wave : stOf(o)===sf.value)));
+    document.getElementById("bn").textContent = SEL.size;
+    list.innerHTML = window._list
+      .map(o => `<button class="item${o.closed?" closed":""}${SEL.has(o.i)?" sel":""}" data-i="${o.i}" aria-current="${cur&&cur.i===o.i}"${selMode?` aria-pressed="${SEL.has(o.i)}"`:""}>${o.avatar?`<img class="ava" src="${esc(o.avatar)}" alt="">`:`<span class="ava">${esc(o.name[0])}</span>`}
       <span><b>${esc(o.name)}</b><small>${o.city?esc(o.city)+" · ":""}${o.closed?"Закрыто · ":""}${o.wave?`Волна 1 (${o.wave}) · `:""}${esc((CAT[o.cat]||[,""])[1])} · ${o.price} BYN</small></span><span class="stars">${DB && stOf(o)!=="new" ? `<i class="dot st-${stOf(o)}" title="${STATUSES.find(x=>x[0]===stOf(o))[1]}"></i>` : stars(o.score)}</span></button>`).join("");
   };
   q.oninput = k.onchange = sf.onchange = ci.onchange = draw;
-  list.onclick = e => { const b = e.target.closest(".item"); if (b) { location.hash = "o" + b.dataset.i; } };
+  list.onclick = e => { const b = e.target.closest(".item"); if (!b) return; const i = +b.dataset.i;
+    if (!selMode) { location.hash = "o" + i; return; } SEL.has(i) ? SEL.delete(i) : SEL.add(i); draw(); };
+  // bulk mode: clicks select instead of opening; status for all selected at once, CSV of the selection
+  const selb = document.getElementById("selb"), bulk = document.getElementById("bulk");
+  selb.onclick = () => { selMode = !selMode; selb.setAttribute("aria-pressed", selMode); selb.textContent = selMode ? "Готово" : "Выбрать несколько"; bulk.hidden = !selMode; if (!selMode) SEL.clear(); draw(); };
+  document.getElementById("ball").onclick = () => { window._list.forEach(o => SEL.add(o.i)); draw(); };
+  document.getElementById("ba").onclick = async () => {
+    if (!DB) { toast("Статусы сохраняются только в опубликованной версии"); return; }
+    const s = document.getElementById("bs").value, os = DATA.filter(o => SEL.has(o.i)); if (!os.length) { toast("Ничего не выбрано"); return; }
+    await Promise.all(os.map(o => saveSt(o, { s }))); toast(`Статус поставлен: ${os.length}`);
+  };
+  document.getElementById("bcsv").onclick = async () => {
+    const os = DATA.filter(o => SEL.has(o.i)); if (!os.length) { toast("Ничего не выбрано"); return; }
+    const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const rows = [["Название","Город","Адрес","Телефон","Instagram","Канал","Статус","Заметка","Демо"],
+      ...os.map(o => [o.name, o.city || "Брест", o.addr, o.contacts?.phones?.[0]?.n, o.contacts?.instagram, channel(o)?.t, STATUSES.find(x => x[0] === stOf(o))[1], ST[o.i]?.note, demoUrl(o)])];
+    const blob = new Blob(["﻿" + rows.map(r => r.map(cell).join(";")).join("\r\n")], { type: "text/csv" });
+    const d = await DLS(); if (!d) { toast("Скачивание доступно в опубликованной версии"); return; }
+    try { await d.save({ filename: "leads.csv", data: blob }); } catch (e) { if (e && e.code !== "declined") toast("Не сохранилось"); }
+  };
   draw(); window._draw = draw;
 }
+let selMode = false; const SEL = new Set();
 
 // who a client sees first when searching this niche on Yandex Maps in Brest (contacts/competitors.json)
 function compBlock(o){
@@ -484,6 +545,7 @@ function renderSheet(o){
     ${ig?`<span class="chip"><a href="https://instagram.com/${esc(ig.h)}" target="_blank" rel="noopener">@${esc(ig.h)}</a>${ig.followers?` · ${esc(ig.followers)} подписчиков`:""}</span>`:`<span class="chip">Instagram не найден</span>`}
     ${o.wave?`<span class="chip">Волна 1 · вариант ${o.wave}</span>`:""}
     ${o.flag?`<span class="chip warn">${esc(o.flag)}</span>`:""}</div></div></header>
+    <div class="act">${o.closed?"":`<button class="btn" type="button" id="send" title="Копирует текст, открывает чат, сохраняет картинку, ставит «Написал»">Отправить${channel(o)?` · ${esc(channel(o).t)}`:" · только текст"}</button>`}<button class="btn ghost" type="button" id="next">Следующий новый →</button></div>
     <div class="block"><h3>Статус</h3><div id="st" class="status"></div></div>
     <div class="cols"><div style="display:flex;flex-direction:column;gap:18px;min-width:0">
       ${contactsBlock(o)}
@@ -506,12 +568,11 @@ function renderSheet(o){
   const cc = document.getElementById("ccopy"); if (cc) cc.onclick = () => copy(o.comp.line, "Скопировано", document.getElementById("m-cline"));
   document.getElementById("copyd").onclick = () => copy(demoUrl(o), "Ссылка скопирована", document.getElementById("m-msg"));
   drawStatus(o);
+  const sb = document.getElementById("send"); if (sb) sb.onclick = () => sendOut(o, firstKey(o));
+  document.getElementById("next").onclick = nextNew;
   // saving a file goes through the viewer's downloads capability; without it only "Открыть" stays
   const dl = document.getElementById("dl");
-  if (dl) DLS().then(d => { if (!d) return; dl.hidden = false; dl.onclick = async () => {
-    try { const blob = await fetch(`shots/${o.i}.jpg`).then(r => r.blob()); await d.save({ filename: `demo-${o.slug || o.i}.jpg`, data: blob }); }
-    catch (e) { if (e && e.code !== "declined") toast("Не получилось сохранить, нажмите «Открыть»"); }
-  }; });
+  if (dl) DLS().then(d => { if (d) { dl.hidden = false; dl.onclick = () => saveShot(o); } });
 }
 let DLP = null; const DLS = () => DLP || (DLP = window.claude?.use ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null));
 
