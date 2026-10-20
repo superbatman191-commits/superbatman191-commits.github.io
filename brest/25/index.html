@@ -7,6 +7,8 @@
 <meta property="og:title" content="Крэда-Дэнт: демо-сайт">
 <meta property="og:description" content="Крэда-Дэнт — стоматология в центре Бреста">
 <meta property="og:url" content="https://superbatman191-commits.github.io/brest/25/">
+<meta property="og:image" content="https://superbatman191-commits.github.io/brest/ig/25/y5.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <script>if(!location.hash)history.replaceState(null,"",location.pathname+location.search+"#d25")</script>
 <meta name="robots" content="noindex, nofollow">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -96,6 +98,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .kit p{margin:6px 0}.kit p:has(b){background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:copy}
 .kit li{margin:3px 0}
 details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
+.shot{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:start}.shot img{width:120px;border-radius:10px;border:1px solid var(--line)}.shot p{margin:0}
+.shot .btn{text-decoration:none}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px}
 @media (max-width:980px){.cols{grid-template-columns:1fr}}
 @media (max-width:760px){.hub{grid-template-columns:1fr}.list{max-height:280px}.sheet{padding:16px}}
@@ -128,6 +132,8 @@ details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
 .s-hero .s-cta{background:var(--d-on);color:var(--d-ac);justify-self:start;width:max-content}
 .s-sec{padding-block:44px;display:flex;flex-direction:column;gap:18px}
 .s-sec h2{font-family:var(--d-disp);font-size:clamp(24px,3.4vw,34px);margin:0;font-weight:600;line-height:1.15}
+.s-rate{font-size:14px;opacity:.95}.s-rate b{font-size:17px;margin-right:4px}
+.s-bill{margin:0;color:var(--d-mute);font-size:14px}
 .s-feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .s-feat div{background:var(--d-soft);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px}
 .s-feat b{font-size:15px}
@@ -173,6 +179,9 @@ const SAMPLE = {
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const dark = hex => { const n = parseInt((hex||"#fff").slice(1),16); return ((n>>16)*.299+((n>>8)&255)*.587+(n&255)*.114) < 120; };
 
+// "1241 оценка", "542 оценки", "51 оценка"
+const votesWord = n => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? "оценка" : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? "оценки" : "оценок"; };
+const fmtPrice = p => esc(String(p).replace(/(\d)\.(\d)/, "$1,$2").replace(/ Br$/, " р."));
 function demo(o){
   const [kind,label] = CAT[o.cat] || ["clean",""];
   const s = SAMPLE[kind];
@@ -186,12 +195,13 @@ function demo(o){
       <button class="s-cta" type="button" data-go="book">${esc(o.cta||"Связаться")}</button></nav>
     <section class="s-hero ${o.hero?"":"nophoto"}">
       <div class="in"><div class="tags"><span>${esc(label)}</span><span>Брест, ${esc(o.addr)}</span>${o.hours?`<span>${esc(o.hours)}</span>`:""}</div>
+      ${o.rating&&o.votes>=10?`<div class="s-rate"><b>★ ${esc(String(o.rating).replace(".",","))}</b> ${o.votes} ${votesWord(o.votes)} на Яндекс Картах</div>`:""}
       <h1>${esc(o.headline||o.name)}</h1><p>${esc(o.sub||o.idea||"")}</p>
       <div><button class="s-cta" type="button" data-go="book">${esc(o.cta||"Связаться")}</button></div></div>
       ${o.hero?`<div class="ph"><img src="${esc(o.hero)}" alt="${esc(o.name)}"></div>`:""}</section>
     <section class="s-sec"><h2>Почему к нам</h2><div class="s-feat">${(o.features||[]).map(f=>`<div><b>${esc(f)}</b></div>`).join("")}</div></section>
     ${ph.length?`<section class="s-sec"><h2>Атмосфера</h2><div class="s-gal">${ph.slice(0,6).map(p=>`<img src="${esc(p.f)}" alt="" loading="lazy">`).join("")}</div></section>`:""}
-    <section class="s-sec"><h2>${s.title}</h2><div class="s-menu">${s.rows.map(r=>`<div><span>${r[0]}</span><span>цена</span></div>`).join("")}</div></section>
+    <section class="s-sec"><h2>${s.title}</h2>${o.bill?`<p class="s-bill">Средний чек ${esc(o.bill.replace(/ Br$/," р."))}</p>`:""}<div class="s-menu">${(o.prices&&o.prices.length?o.prices.map(p=>[esc(p[0]),fmtPrice(p[1])]):s.rows.map(r=>[r[0],"цена"])).map(r=>`<div><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>${o.prices&&o.prices.length?`<p class="s-bill">Цены из вашей карточки на Яндекс Картах</p>`:""}</section>
     <section class="s-sec" id="book-${o.i}"><div class="s-book"><div><h2>${esc(o.cta||"Онлайн-заявка")}</h2><p>Заявка приходит владельцу в Telegram или Viber за секунду. Клиенту не нужно дозваниваться.</p></div>
       <form data-demo>${s.form.map((f,k)=>`<input id="f${o.i}-${k}" placeholder="${f}" aria-label="${f}">`).join("")}<input id="f${o.i}-t" placeholder="Телефон" aria-label="Телефон"><button class="s-cta">${esc(o.cta||"Отправить")}</button><div class="ok" hidden>Это демо: на рабочем сайте заявка сразу уйдёт вам в мессенджер.</div></form></div></section>
     <footer class="s-foot"><div><b>Адрес</b>Брест, ${esc(o.addr)}<br><a href="${map}" target="_blank" rel="noopener">Открыть на карте</a></div>
@@ -320,6 +330,9 @@ function renderSheet(o){
       ${o.fu3?`<details class="block" style="border-top:1px solid var(--line);padding-top:10px"><summary>Повтор, если нет ответа: 3-й день и 7-й день</summary>
         <h3 style="margin-top:10px">3-й день</h3><div class="msg" id="m-fu3">${esc(fill(o,o.fu3))}</div><div class="row"><button class="btn" type="button" data-copy="fu3">Скопировать</button></div>
         <h3 style="margin-top:14px">7-й день, последнее</h3><div class="msg" id="m-fu7">${esc(fill(o,o.fu7))}</div><div class="row"><button class="btn" type="button" data-copy="fu7">Скопировать</button></div></details>`:""}
+      ${o.closed?"":`<div class="block"><h3>Картинка к сообщению</h3><div class="shot"><img src="shots/${o.i}.jpg" alt="Демо на экране телефона" loading="lazy">
+        <div><p class="mute">Отправьте вместе с первым сообщением: в Instagram незнакомые ссылки видны не сразу, а картинку с их заведением замечают.</p>
+        <div class="row"><a class="btn" href="shots/${o.i}.jpg" download="demo-${o.i}.jpg">Скачать</a><a class="btn ghost" href="shots/${o.i}.jpg" target="_blank" rel="noopener">Открыть</a></div></div></div></div>`}
       <div class="block"><h3>Зачем им сайт</h3><ul class="why">${(o.why||[]).map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>
       <div class="block"><h3>Что предлагаем</h3><div class="price">${esc(o.type)} · от <b>${o.price}</b> BYN · поддержка ${o.monthly} BYN/мес</div></div>
     </div>
