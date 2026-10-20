@@ -240,7 +240,7 @@ details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
 const CAT = {
   restaurant:["food","Ресторан"],cafe:["food","Кафе"],bar:["food","Бар"],pub:["food","Паб"],fast_food:["food","Фастфуд"],
   confectionery:["food","Кондитерская"],hairdresser:["beauty","Парикмахерская"],beauty:["beauty","Салон красоты"],
-  massage:["beauty","Массаж"],dentist:["clean","Стоматология"],car_repair:["auto","Автосервис"],car_wash:["auto","Автомойка"],
+  massage:["beauty","Массаж"],dentist:["clean","Стоматология"],veterinary:["clean","Ветклиника"],nightclub:["food","Ночной клуб"],hookah:["food","Кальян-бар"],car_repair:["auto","Автосервис"],car_wash:["auto","Автомойка"],
   apartment:["stay","Апартаменты"],guest_house:["stay","Агроусадьба"],fitness_centre:["auto","Спорт"],
   "craft:window_construction":["auto","Окна"]
 };
@@ -275,11 +275,11 @@ function demo(o){
   const [bg,ac] = o.palette || ["#faf7f2","#8a3b2e"];
   const [btn,on] = btnColors(ac);
   const ph = (o.photos||[]).filter(p=>p.f!==o.hero).slice(0,5);
-  const map = `https://yandex.by/maps/?text=${encodeURIComponent(o.name+" "+o.addr+" Брест")}`;
+  const map = `https://yandex.by/maps/?text=${encodeURIComponent(o.name+" "+o.addr+" "+(o.city||"Брест"))}`;
   const cta = esc(o.cta||"Связаться");
   const real = o.prices && o.prices.length;
   const meta = [o.rating&&o.votes>=10?`<span><b>★ ${esc(String(o.rating).replace(".",","))}</b> · ${o.votes} ${votesWord(o.votes)} на Яндекс Картах</span>`:"",
-    `<span>Брест, ${esc(o.addr)}</span>`, o.hours?`<span>${esc(o.hours)}</span>`:""].join("");
+    `<span>${esc(o.city||"Брест")}, ${esc(o.addr)}</span>`, o.hours?`<span>${esc(o.hours)}</span>`:""].join("");
   return `<div class="site ${FONT[kind]} ${dark(bg)?"dark":""}" style="--d-bg:${esc(bg)};--d-ac:${esc(ac)};--d-btn:${btn};--d-on:${on}">
   <div class="s-wrap">
     <nav class="s-nav"><div class="s-logo">${o.avatar?`<img src="${esc(o.avatar)}" alt="">`:""}<span>${esc(o.name)}</span></div>
@@ -300,7 +300,7 @@ function demo(o){
       <span class="s-pill" data-r>${real?"Цены из вашей карточки на Яндекс Картах":"Здесь будет ваше меню с актуальными ценами"}</span></section>
     <section class="s-sec" id="book-${o.i}"><div class="s-shell" data-r><div class="s-core s-book"><div><span class="s-eye">Онлайн-заявка</span><h2>${cta}</h2><p>Заявка приходит владельцу в Telegram или Viber за секунду. Клиенту не нужно дозваниваться.</p></div>
       <form data-demo>${(o.form&&o.form.length===3?o.form.map(esc):s.form).map((f,k)=>`<input id="f${o.i}-${k}" placeholder="${f}" aria-label="${f}">`).join("")}<input id="f${o.i}-t" placeholder="Телефон" aria-label="Телефон"><button class="s-cta">${cta}${arrow}</button><div class="ok" hidden>Это демо: на рабочем сайте заявка сразу уйдёт вам в мессенджер.</div></form></div></div></section>
-    <footer class="s-foot"><div><b>Адрес</b>Брест, ${esc(o.addr)}<br><a href="${map}" target="_blank" rel="noopener">Открыть на карте</a></div>
+    <footer class="s-foot"><div><b>Адрес</b>${esc(o.city||"Брест")}, ${esc(o.addr)}<br><a href="${map}" target="_blank" rel="noopener">Открыть на карте</a></div>
       <div><b>Часы работы</b>${esc(o.hours||"уточняйте по телефону")}</div>
       ${o.contacts?.phones?.[0]?`<div><b>Телефон</b>${esc(o.contacts.phones[0].n)}</div>`:""}
       ${o.ig?`<div><b>Instagram</b><a href="https://instagram.com/${esc(o.ig.h)}" target="_blank" rel="noopener">@${esc(o.ig.h)}</a></div>`:""}</footer>
@@ -379,9 +379,9 @@ function contactsBlock(o){
 }
 
 // public copy of the demos (no messages, contacts or prices) lives on GitHub Pages
-const DEMO_BASE = "https://superbatman191-commits.github.io/brest/";
+const DEMO_BASE = "https://superbatman191-commits.github.io/brest/", DEMO_ROOT = "https://superbatman191-commits.github.io/";
 // each org has its own folder (brest/<id>/) so messenger link previews show its name and photo
-const demoUrl = o => DEMO_BASE + o.i + "/";
+const demoUrl = o => DEMO_ROOT + (o.citySlug || "brest") + "/" + o.i + "/";
 // demo opens are counted by a free keyless counter (abacus); ?me=1 once on the public site stops counting your own opens
 const CNT = "https://abacus.jasoncameron.dev";
 const store = (k, v) => { try { return v === undefined ? localStorage.getItem(k) : localStorage.setItem(k, v); } catch { return null; } };
@@ -409,19 +409,19 @@ const fill = (o, t) => (t||"").replace("{DEMO}", demoUrl(o));
 function msgText(o){ return fill(o, o.msg); }
 
 function renderHub(){
-  app.innerHTML = `<div class="hub"><aside class="rail"><h1>50 офферов: Брест без сайта</h1>
+  app.innerHTML = `<div class="hub"><aside class="rail"><h1>Офферы: бизнес без сайта</h1>
     <p class="lead">Сообщение для первого контакта, аргументы и демо-сайт под каждую организацию. <a href="${DEMO_BASE}#stats" target="_blank" rel="noopener">Кто открывал демо</a> · <a href="#kit">Скрипты и возражения</a></p>
     <div class="filters"><input id="q" placeholder="Поиск по названию" aria-label="Поиск"><select id="k" aria-label="Тип">
-    <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select><select id="sf" aria-label="Статус"><option value="">Любой статус</option><option value="w1">Волна 1</option>${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
+    <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select><select id="ci" aria-label="Город"><option value="">Все города</option>${[...new Set(DATA.map(o=>o.city||"Брест"))].map(c=>`<option>${esc(c)}</option>`).join("")}</select><select id="sf" aria-label="Статус"><option value="">Любой статус</option><option value="w1">Волна 1</option>${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
     <div class="list" id="list"></div></aside><main class="sheet" id="sheet"></main></div>`;
-  const list = document.getElementById("list"), q = document.getElementById("q"), k = document.getElementById("k"), sf = document.getElementById("sf");
+  const ci = document.getElementById("ci"), list = document.getElementById("list"), q = document.getElementById("q"), k = document.getElementById("k"), sf = document.getElementById("sf");
   const draw = () => {
     const t = q.value.toLowerCase();
-    list.innerHTML = [...DATA].sort((a,b)=>a.closed-b.closed).filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value) && (!sf.value || (sf.value==="w1" ? !!o.wave : stOf(o)===sf.value)))
+    list.innerHTML = [...DATA].sort((a,b)=>a.closed-b.closed).filter(o => (!t || o.name.toLowerCase().includes(t)) && (!k.value || (CAT[o.cat]||[])[0]===k.value) && (!ci.value || (o.city||"Брест")===ci.value) && (!sf.value || (sf.value==="w1" ? !!o.wave : stOf(o)===sf.value)))
       .map(o => `<button class="item${o.closed?" closed":""}" data-i="${o.i}" aria-current="${cur&&cur.i===o.i}">${o.avatar?`<img class="ava" src="${esc(o.avatar)}" alt="">`:`<span class="ava">${esc(o.name[0])}</span>`}
-      <span><b>${esc(o.name)}</b><small>${o.closed?"Закрыто · ":""}${o.wave?`Волна 1 (${o.wave}) · `:""}${esc((CAT[o.cat]||[,""])[1])} · ${o.price} BYN</small></span><span class="stars">${DB && stOf(o)!=="new" ? `<i class="dot st-${stOf(o)}" title="${STATUSES.find(x=>x[0]===stOf(o))[1]}"></i>` : stars(o.score)}</span></button>`).join("");
+      <span><b>${esc(o.name)}</b><small>${o.city?esc(o.city)+" · ":""}${o.closed?"Закрыто · ":""}${o.wave?`Волна 1 (${o.wave}) · `:""}${esc((CAT[o.cat]||[,""])[1])} · ${o.price} BYN</small></span><span class="stars">${DB && stOf(o)!=="new" ? `<i class="dot st-${stOf(o)}" title="${STATUSES.find(x=>x[0]===stOf(o))[1]}"></i>` : stars(o.score)}</span></button>`).join("");
   };
-  q.oninput = k.onchange = sf.onchange = draw;
+  q.oninput = k.onchange = sf.onchange = ci.onchange = draw;
   list.onclick = e => { const b = e.target.closest(".item"); if (b) { location.hash = "o" + b.dataset.i; } };
   draw(); window._draw = draw;
 }
@@ -438,7 +438,7 @@ function renderSheet(o){
   cur = o; window._draw && window._draw();
   const ig = o.ig;
   document.getElementById("sheet").innerHTML = `<header>${o.avatar?`<img src="${esc(o.avatar)}" alt="">`:""}<div style="min-width:0">
-    <h2>${esc(o.name)}</h2><div class="meta"><span class="chip">${esc((CAT[o.cat]||[,""])[1])}</span><span class="chip">${esc(o.addr)}</span>
+    <h2>${esc(o.name)}</h2><div class="meta"><span class="chip">${esc((CAT[o.cat]||[,""])[1])}</span><span class="chip">${esc(o.city||"Брест")}, ${esc(o.addr)}</span>
     ${ig?`<span class="chip"><a href="https://instagram.com/${esc(ig.h)}" target="_blank" rel="noopener">@${esc(ig.h)}</a>${ig.followers?` · ${esc(ig.followers)} подписчиков`:""}</span>`:`<span class="chip">Instagram не найден</span>`}
     ${o.wave?`<span class="chip">Волна 1 · вариант ${o.wave}</span>`:""}
     ${o.flag?`<span class="chip warn">${esc(o.flag)}</span>`:""}</div></div></header>
@@ -480,7 +480,7 @@ function route(){
   if (h === "kit") { renderKit(); return; }
   if (h[0] === "d" && o) { document.title = o.name; app.innerHTML = demo(o); reveal(app); countOpen(o); document.body.style.background = (o.palette||["#faf7f2"])[0]; cur = null; return; }
   if (!DATA.some(x => x.msg)) { app.innerHTML = `<p class="hub">Откройте ссылку на демо-сайт, которую вам прислали.</p>`; return; }
-  document.title = "Брест: 50 офферов";
+  document.title = "Офферы: бизнес без сайта";
   if (!document.getElementById("sheet")) renderHub();
   renderSheet(o || DATA[0]);
 }
