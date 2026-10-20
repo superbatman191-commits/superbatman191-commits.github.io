@@ -5,7 +5,7 @@
 <base href="../">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Бар «Дача»: демо-сайт">
-<meta property="og:description" content="Дача — место для праздников в Бресте">
+<meta property="og:description" content="Вечер с террасой и вкусом">
 <meta property="og:url" content="https://superbatman191-commits.github.io/brest/142/">
 <meta property="og:image" content="https://superbatman191-commits.github.io/brest/ig/142/p7.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -104,57 +104,135 @@ details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
 @media (max-width:980px){.cols{grid-template-columns:1fr}}
 @media (max-width:760px){.hub{grid-template-columns:1fr}.list{max-height:280px}.sheet{padding:16px}}
 
-/* ---------- demo site (its own palette via --d-bg / --d-ac set inline) ---------- */
-.site{--d-bg:#faf7f2;--d-ac:#8a3b2e;--d-fg:#1e1b18;--d-mute:color-mix(in srgb,var(--d-fg) 62%,var(--d-bg));
-  --d-soft:color-mix(in srgb,var(--d-ac) 9%,var(--d-bg));--d-disp:"Prata",Georgia,serif;
-  background:var(--d-bg);color:var(--d-fg);font:15px/1.55 var(--f-ui);min-height:100%}
-.site.dark{--d-fg:#f2efe9}
+/* ---------- demo site: editorial, warm; palette per org via --d-bg / --d-ac / --d-btn set inline ---------- */
+.site{--d-bg:#faf7f2;--d-ac:#8a3b2e;--d-btn:var(--d-ac);--d-fg:#1e1b18;--d-mute:color-mix(in srgb,var(--d-fg) 60%,var(--d-bg));
+  --d-soft:color-mix(in srgb,var(--d-ac) 7%,var(--d-bg));--d-line:color-mix(in srgb,var(--d-fg) 9%,transparent);
+  --d-shell:color-mix(in srgb,var(--d-fg) 4%,transparent);--d-disp:"Prata",Georgia,serif;
+  --ease:cubic-bezier(.32,.72,0,1);--sec:clamp(64px,9vw,120px);
+  background:var(--d-bg);color:var(--d-fg);font:16px/1.6 var(--f-ui);min-height:100%;position:relative}
+.site.dark{--d-fg:#f2efe9;--d-shell:color-mix(in srgb,#fff 5%,transparent);--d-line:color-mix(in srgb,#fff 10%,transparent)}
 .site.f-auto{--d-disp:"Oswald","Arial Narrow",sans-serif}
 .site.f-beauty{--d-disp:"Cormorant Garamond",Georgia,serif}
 .site.f-clean{--d-disp:"Golos Text",system-ui,sans-serif}
-.s-wrap{max-width:1080px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
-.s-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:14px;flex-wrap:wrap}
-.s-logo{font-family:var(--d-disp);font-size:20px;font-weight:600;display:flex;gap:10px;align-items:center}
-.s-logo img{width:34px;height:34px;border-radius:50%;object-fit:cover}
-.s-links{display:flex;gap:16px;font-size:13px;color:var(--d-mute);flex-wrap:wrap}
-.s-cta{background:var(--d-ac);color:var(--d-on);border:0;border-radius:999px;padding:10px 20px;font-weight:600;cursor:pointer;white-space:nowrap}
-.s-hero{display:grid;grid-template-columns:1.15fr 1fr;border-radius:18px;overflow:hidden;background:var(--d-ac);color:var(--d-on)}
-.s-hero.nophoto{grid-template-columns:1fr}
+.site::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.frame .site::after{position:absolute}
+.s-wrap{max-width:1160px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* floating island nav */
+.s-nav{position:sticky;top:12px;z-index:2;margin:12px auto 0;display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:8px 8px 8px 18px;border-radius:999px;background:color-mix(in srgb,var(--d-bg) 78%,transparent);
+  backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 0 0 1px var(--d-line),0 12px 40px -18px rgba(0,0,0,.18)}
+.s-logo{font-family:var(--d-disp);font-size:19px;font-weight:600;display:flex;gap:10px;align-items:center;min-width:0;line-height:1.15}
+.s-logo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-logo img{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none}
+.s-links{display:flex;gap:22px;font-size:13px;color:var(--d-mute)}
+.s-nav .s-cta{padding:10px 18px}
+
+/* island buttons with a nested arrow */
+.s-cta{display:inline-flex;align-items:center;gap:10px;background:var(--d-btn);color:var(--d-on);border:0;border-radius:999px;padding:12px 12px 12px 24px;
+  font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.s-cta i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:14px;
+  background:color-mix(in srgb,var(--d-on) 16%,transparent);transition:transform .5s var(--ease)}
+.s-cta:hover{box-shadow:0 14px 30px -14px color-mix(in srgb,var(--d-btn) 70%,transparent)}
+.s-cta:hover i{transform:translate(2px,-1px) scale(1.06)}
+.s-cta:active{transform:scale(.98)}
+.s-cta.plain{padding:10px 18px}
+
+/* eyebrow pill */
+.s-eye{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;border-radius:999px;padding:5px 12px;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:600;background:var(--d-soft);color:var(--d-ac);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--d-ac) 18%,transparent)}
+.dark .s-eye{color:color-mix(in srgb,var(--d-ac) 70%,#fff)}
+.s-eye::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* double-bezel shell */
+.s-shell{padding:6px;border-radius:32px;background:var(--d-shell);box-shadow:0 0 0 1px var(--d-line)}
+.s-core{border-radius:26px;overflow:hidden;box-shadow:inset 0 1px 1px rgba(255,255,255,.14)}
+
+/* hero */
+.s-hero-wrap{padding-top:clamp(24px,4vw,44px)}
+.s-hero{display:grid;grid-template-columns:1.05fr 1fr;background:var(--d-ac);color:var(--d-on);min-height:520px}
+.s-hero.nophoto{grid-template-columns:1fr;min-height:0}
 .s-hero .ph{position:relative;min-height:340px;overflow:hidden}
-.s-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.s-hero .in{padding:clamp(22px,4vw,44px);display:flex;flex-direction:column;justify-content:center;gap:14px;min-width:0;
-  background:linear-gradient(160deg,var(--d-ac),color-mix(in srgb,var(--d-ac) 78%,#000))}
-.s-hero h1{font-family:var(--d-disp);font-size:clamp(30px,4.4vw,48px);line-height:1.08;margin:0;font-weight:600;text-wrap:balance}
-.site.f-auto .s-hero h1{text-transform:uppercase;letter-spacing:.01em}
-.s-hero p{margin:0;font-size:16px;opacity:.92}
-.s-hero .tags{display:flex;gap:8px;flex-wrap:wrap;font-size:12px}
-.s-hero .tags span{background:color-mix(in srgb,var(--d-on) 16%,transparent);padding:3px 10px;border-radius:999px}
-.s-hero .s-cta{background:var(--d-on);color:var(--d-ac);justify-self:start;width:max-content}
-.s-sec{padding-block:44px;display:flex;flex-direction:column;gap:18px}
-.s-sec h2{font-family:var(--d-disp);font-size:clamp(24px,3.4vw,34px);margin:0;font-weight:600;line-height:1.15}
-.s-rate{font-size:14px;opacity:.95}.s-rate b{font-size:17px;margin-right:4px}
-.s-bill{margin:0;color:var(--d-mute);font-size:14px}
-.s-feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.s-feat div{background:var(--d-soft);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px}
-.s-feat b{font-size:15px}
-.s-feat small{color:var(--d-mute);font-size:13px}
-.s-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.s-gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;max-width:100%}
-.s-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px 28px}
-.s-menu div{display:flex;justify-content:space-between;gap:12px;padding-block:10px;border-bottom:1px dashed color-mix(in srgb,var(--d-fg) 22%,transparent)}
+.s-hero .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.s-hero .in{padding:clamp(28px,5vw,60px);display:flex;flex-direction:column;justify-content:center;gap:18px;min-width:0;
+  background:linear-gradient(160deg,var(--d-ac),color-mix(in srgb,var(--d-ac) 76%,#000))}
+.s-hero .s-eye{background:color-mix(in srgb,var(--d-on) 14%,transparent);color:var(--d-on);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--d-on) 22%,transparent)}
+.s-hero h1{font-family:var(--d-disp);font-size:clamp(34px,5vw,60px);line-height:1.04;margin:0;font-weight:600;text-wrap:balance;letter-spacing:-.01em}
+.site.f-auto .s-hero h1{text-transform:uppercase;letter-spacing:.005em}
+.s-hero p{margin:0;font-size:17px;opacity:.9;max-width:34em}
+.s-hero .s-cta{background:var(--d-on);color:var(--d-btn)}
+.s-hero .s-cta i{background:color-mix(in srgb,var(--d-btn) 14%,transparent)}
+.s-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;opacity:.85;padding-top:6px;border-top:1px solid color-mix(in srgb,var(--d-on) 18%,transparent)}
+.s-meta b{font-size:15px}
+
+/* sections */
+.s-sec{padding-block:var(--sec) 0;display:flex;flex-direction:column;gap:22px}
+.s-head{display:flex;flex-direction:column;gap:12px;max-width:640px}
+.s-sec h2{font-family:var(--d-disp);font-size:clamp(28px,4vw,44px);margin:0;font-weight:600;line-height:1.08;text-wrap:balance}
+.s-note{margin:0;color:var(--d-mute);font-size:15px}
+
+/* features: numbered bezel cards */
+.s-feat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.s-feat .s-core{background:var(--d-bg);padding:22px 20px 24px;height:100%;display:flex;flex-direction:column;gap:28px}
+.s-feat small{font-family:var(--d-disp);font-size:15px;color:var(--d-ac);letter-spacing:.06em}
+.dark .s-feat small{color:color-mix(in srgb,var(--d-ac) 70%,#fff)}
+.s-feat b{font-size:17px;line-height:1.3;font-weight:600}
+.s-feat .s-shell{border-radius:26px;padding:5px}.s-feat .s-core{border-radius:21px}
+
+/* gallery: asymmetric bento */
+.s-gal{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:clamp(150px,17vw,220px);gap:10px}
+.s-gal img{width:100%;height:100%;object-fit:cover;border-radius:22px;display:block;transition:transform .9s var(--ease)}
+.s-gal div{overflow:hidden;border-radius:22px}
+.s-gal div:first-child{grid-column:span 2;grid-row:span 2}
+.s-gal div:hover img{transform:scale(1.04)}
+/* fewer photos: n1 one wide tile, n2/n4 equal tiles, n3 one tall + two */
+.s-gal.n1{grid-template-columns:1fr;grid-auto-rows:clamp(220px,32vw,420px)}
+.s-gal.n2,.s-gal.n4{grid-template-columns:repeat(2,1fr)}
+.s-gal.n3{grid-template-columns:repeat(2,1fr)}
+.s-gal.n1 div:first-child,.s-gal.n2 div:first-child,.s-gal.n4 div:first-child{grid-column:auto;grid-row:auto}
+.s-gal.n3 div:first-child{grid-column:auto;grid-row:span 2}
+
+/* menu / prices */
+.s-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 40px}
+.s-menu div{display:flex;justify-content:space-between;gap:16px;padding-block:15px;border-bottom:1px solid var(--d-line);font-size:16px}
 .s-menu span:last-child{color:var(--d-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
-.s-book{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:var(--d-soft);border-radius:18px;padding:26px}
-.s-book form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.s-book input,.s-book select{padding:11px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--d-fg) 18%,transparent);background:var(--d-bg);min-width:0}
-.s-book .s-cta{grid-column:1/-1}
+.s-menu.names span:last-child{display:none}
+.s-pill{align-self:flex-start;font-size:13px;color:var(--d-mute);border-radius:999px;padding:6px 14px;box-shadow:inset 0 0 0 1px var(--d-line)}
+
+/* booking */
+.s-book{display:grid;grid-template-columns:1fr 1fr;gap:28px;background:var(--d-soft);padding:clamp(24px,4vw,44px)}
+.s-book h2{margin-top:12px}
+.s-book p{color:var(--d-mute)}
+.s-book form{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start}
+.s-book input{padding:14px 16px;border-radius:16px;border:0;box-shadow:inset 0 0 0 1px var(--d-line);background:var(--d-bg);min-width:0;font-size:15px;
+  transition:box-shadow .4s var(--ease)}
+.s-book input:focus{outline:none;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--d-ac) 60%,transparent)}
+.s-book .s-cta{grid-column:1/-1;justify-content:space-between}
 .s-book .ok{grid-column:1/-1;font-size:13px;color:var(--d-mute)}
-.s-foot{padding-block:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;font-size:14px;border-top:1px solid color-mix(in srgb,var(--d-fg) 14%,transparent)}
-.s-foot b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--d-mute);font-weight:600;margin-bottom:4px}
-.s-foot a{color:var(--d-ac)}
-.s-demo{font-size:12px;text-align:center;color:var(--d-mute);padding-block:16px}
-.frame .s-hero{grid-template-columns:1fr}.frame .s-hero .ph{min-height:260px;order:-1}
-@media (max-width:700px){.s-hero{grid-template-columns:1fr}.s-hero .ph{order:-1;min-height:260px}.s-book,.s-book form{grid-template-columns:1fr}.s-gal{grid-template-columns:repeat(2,1fr)}.s-links{display:none}}
-@media (prefers-reduced-motion:no-preference){.s-hero img{animation:kb 18s ease-out both}@keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}}
+
+.s-foot{margin-top:var(--sec);padding-block:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;font-size:14px;border-top:1px solid var(--d-line)}
+.s-foot b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--d-mute);font-weight:600;margin-bottom:6px}
+.s-foot a{color:inherit;text-decoration-color:color-mix(in srgb,var(--d-ac) 60%,transparent);text-underline-offset:3px}
+.s-demo{font-size:12px;text-align:center;color:var(--d-mute);padding-block:18px 26px}
+
+/* scroll reveal: added by JS only, so content stays visible without it */
+.site.rv [data-r]{opacity:0;transform:translateY(28px);filter:blur(6px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)}
+.site.rv [data-r].in{opacity:1;transform:none;filter:none}
+@media (prefers-reduced-motion:no-preference){.s-hero .ph img{animation:kb 16s var(--ease) both}@keyframes kb{from{transform:scale(1.07)}to{transform:scale(1)}}}
+
+/* hub preview frame and phones: single column */
+.frame .s-hero{grid-template-columns:1fr;min-height:0}.frame .s-hero .ph{min-height:260px;order:-1}
+.frame .s-feat{grid-template-columns:repeat(2,minmax(0,1fr))}.frame .s-links{display:none}
+@media (max-width:900px){.s-feat{grid-template-columns:repeat(2,minmax(0,1fr))}.s-links{display:none}}
+@media (max-width:700px){
+  .s-hero{grid-template-columns:1fr;min-height:0}.s-hero .ph{order:-1;min-height:280px}
+  .s-book,.s-book form,.s-menu{grid-template-columns:1fr}
+  .s-gal{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px}.s-gal.n5 div:first-child,.s-gal.n3 div:first-child{grid-column:span 2;grid-row:span 2}.s-gal.n1{grid-auto-rows:240px}
+  .s-nav{padding-left:12px}.s-logo{font-size:16px}.s-nav .s-cta{padding:9px 14px;font-size:14px}
+  .s-feat{gap:10px}.s-feat .s-core{padding:16px 14px 18px;gap:18px}.s-feat b{font-size:15px}
+}
+@media (max-width:420px){.s-nav .s-cta{display:none}}
 </style>
 
 <div id="app"></div>
@@ -182,34 +260,63 @@ const dark = hex => { const n = parseInt((hex||"#fff").slice(1),16); return ((n>
 // "1241 оценка", "542 оценки", "51 оценка"
 const votesWord = n => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? "оценка" : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? "оценки" : "оценок"; };
 const fmtPrice = p => esc(String(p).replace(/(\d)\.(\d)/, "$1,$2").replace(/ Br$/, " р."));
+// WCAG contrast; buttons darken the org accent until white text passes 4.5
+const lumOf = hex => { const n = parseInt(hex.slice(1),16); return [n>>16,(n>>8)&255,n&255].map(v => { v /= 255; return v <= .03928 ? v/12.92 : ((v+.055)/1.055)**2.4; }).reduce((a,v,k) => a + v*[.2126,.7152,.0722][k], 0); };
+const contrast = (a,b) => { const x = lumOf(a), y = lumOf(b); return (Math.max(x,y)+.05)/(Math.min(x,y)+.05); };
+const shade = (hex, k) => "#" + [16,8,0].map(s => Math.round(((parseInt(hex.slice(1),16)>>s)&255)*(1-k)).toString(16).padStart(2,"0")).join("");
+function btnColors(ac){
+  const on = dark(ac) ? "#ffffff" : "#1b1712";
+  let b = ac; if (on === "#ffffff") for (let k = .06; contrast(b, on) < 4.5 && k < .6; k += .06) b = shade(ac, k);
+  return [b, on];
+}
+const arrow = `<i aria-hidden="true">↗</i>`;
 function demo(o){
   const [kind,label] = CAT[o.cat] || ["clean",""];
   const s = SAMPLE[kind];
   const [bg,ac] = o.palette || ["#faf7f2","#8a3b2e"];
-  const ph = (o.photos||[]).filter(p=>p.f!==o.hero);
+  const [btn,on] = btnColors(ac);
+  const ph = (o.photos||[]).filter(p=>p.f!==o.hero).slice(0,5);
   const map = `https://yandex.by/maps/?text=${encodeURIComponent(o.name+" "+o.addr+" Брест")}`;
-  return `<div class="site ${FONT[kind]} ${dark(bg)?"dark":""}" style="--d-bg:${esc(bg)};--d-ac:${esc(ac)};--d-on:${dark(ac)?"#fff":"#1b1712"}">
+  const cta = esc(o.cta||"Связаться");
+  const real = o.prices && o.prices.length;
+  const meta = [o.rating&&o.votes>=10?`<span><b>★ ${esc(String(o.rating).replace(".",","))}</b> · ${o.votes} ${votesWord(o.votes)} на Яндекс Картах</span>`:"",
+    `<span>Брест, ${esc(o.addr)}</span>`, o.hours?`<span>${esc(o.hours)}</span>`:""].join("");
+  return `<div class="site ${FONT[kind]} ${dark(bg)?"dark":""}" style="--d-bg:${esc(bg)};--d-ac:${esc(ac)};--d-btn:${btn};--d-on:${on}">
   <div class="s-wrap">
-    <nav class="s-nav"><div class="s-logo">${o.avatar?`<img src="${esc(o.avatar)}" alt="">`:""}${esc(o.name)}</div>
+    <nav class="s-nav"><div class="s-logo">${o.avatar?`<img src="${esc(o.avatar)}" alt="">`:""}<span>${esc(o.name)}</span></div>
       <div class="s-links">${(o.sections||[]).slice(0,4).map(x=>`<span>${esc(x)}</span>`).join("")}</div>
-      <button class="s-cta" type="button" data-go="book">${esc(o.cta||"Связаться")}</button></nav>
-    <section class="s-hero ${o.hero?"":"nophoto"}">
-      <div class="in"><div class="tags"><span>${esc(label)}</span><span>Брест, ${esc(o.addr)}</span>${o.hours?`<span>${esc(o.hours)}</span>`:""}</div>
-      ${o.rating&&o.votes>=10?`<div class="s-rate"><b>★ ${esc(String(o.rating).replace(".",","))}</b> ${o.votes} ${votesWord(o.votes)} на Яндекс Картах</div>`:""}
+      <button class="s-cta plain" type="button" data-go="book">${cta}</button></nav>
+    <div class="s-hero-wrap"><div class="s-shell"><section class="s-core s-hero ${o.hero?"":"nophoto"}">
+      <div class="in"><span class="s-eye">${esc(o.eyebrow||label)}</span>
       <h1>${esc(o.headline||o.name)}</h1><p>${esc(o.sub||o.idea||"")}</p>
-      <div><button class="s-cta" type="button" data-go="book">${esc(o.cta||"Связаться")}</button></div></div>
-      ${o.hero?`<div class="ph"><img src="${esc(o.hero)}" alt="${esc(o.name)}"></div>`:""}</section>
-    <section class="s-sec"><h2>Почему к нам</h2><div class="s-feat">${(o.features||[]).map(f=>`<div><b>${esc(f)}</b></div>`).join("")}</div></section>
-    ${ph.length?`<section class="s-sec"><h2>Атмосфера</h2><div class="s-gal">${ph.slice(0,6).map(p=>`<img src="${esc(p.f)}" alt="" loading="lazy">`).join("")}</div></section>`:""}
-    <section class="s-sec"><h2>${s.title}</h2>${o.bill?`<p class="s-bill">Средний чек ${esc(o.bill.replace(/ Br$/," р."))}</p>`:""}<div class="s-menu">${(o.prices&&o.prices.length?o.prices.map(p=>[esc(p[0]),fmtPrice(p[1])]):s.rows.map(r=>[r[0],"цена"])).map(r=>`<div><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>${o.prices&&o.prices.length?`<p class="s-bill">Цены из вашей карточки на Яндекс Картах</p>`:""}</section>
-    <section class="s-sec" id="book-${o.i}"><div class="s-book"><div><h2>${esc(o.cta||"Онлайн-заявка")}</h2><p>Заявка приходит владельцу в Telegram или Viber за секунду. Клиенту не нужно дозваниваться.</p></div>
-      <form data-demo>${s.form.map((f,k)=>`<input id="f${o.i}-${k}" placeholder="${f}" aria-label="${f}">`).join("")}<input id="f${o.i}-t" placeholder="Телефон" aria-label="Телефон"><button class="s-cta">${esc(o.cta||"Отправить")}</button><div class="ok" hidden>Это демо: на рабочем сайте заявка сразу уйдёт вам в мессенджер.</div></form></div></section>
+      <div><button class="s-cta" type="button" data-go="book">${cta}${arrow}</button></div>
+      <div class="s-meta">${meta}</div></div>
+      ${o.hero?`<div class="ph"><img src="${esc(o.hero)}" alt="${esc(o.name)}"></div>`:""}</section></div></div>
+    <section class="s-sec"><div class="s-head" data-r><span class="s-eye">Почему к нам</span><h2>${esc(o.name)}: коротко о главном</h2></div>
+      <div class="s-feat">${(o.features||[]).slice(0,4).map((f,k)=>`<div class="s-shell" data-r style="transition-delay:${k*80}ms"><div class="s-core"><small>0${k+1}</small><b>${esc(f)}</b></div></div>`).join("")}</div></section>
+    ${ph.length?`<section class="s-sec"><div class="s-head" data-r><span class="s-eye">Атмосфера</span><h2>Загляните к нам</h2></div>
+      <div class="s-gal n${ph.length}" data-r>${ph.map(p=>`<div><img src="${esc(p.f)}" alt="" loading="lazy"></div>`).join("")}</div></section>`:""}
+    <section class="s-sec"><div class="s-head" data-r><span class="s-eye">${real?"Цены":"Меню и услуги"}</span><h2>${esc(o.menuTitle||s.title)}</h2>${o.bill?`<p class="s-note">Средний чек ${esc(o.bill.replace(/ Br$/," р."))}</p>`:""}</div>
+      <div class="s-menu${real?"":" names"}" data-r>${(real?o.prices.map(p=>[esc(p[0]),fmtPrice(p[1])]):(o.items&&o.items.length?o.items.map(x=>[esc(x),""]):s.rows.map(r=>[r[0],""]))).map(r=>`<div><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>
+      <span class="s-pill" data-r>${real?"Цены из вашей карточки на Яндекс Картах":"Здесь будет ваше меню с актуальными ценами"}</span></section>
+    <section class="s-sec" id="book-${o.i}"><div class="s-shell" data-r><div class="s-core s-book"><div><span class="s-eye">Онлайн-заявка</span><h2>${cta}</h2><p>Заявка приходит владельцу в Telegram или Viber за секунду. Клиенту не нужно дозваниваться.</p></div>
+      <form data-demo>${(o.form&&o.form.length===3?o.form.map(esc):s.form).map((f,k)=>`<input id="f${o.i}-${k}" placeholder="${f}" aria-label="${f}">`).join("")}<input id="f${o.i}-t" placeholder="Телефон" aria-label="Телефон"><button class="s-cta">${cta}${arrow}</button><div class="ok" hidden>Это демо: на рабочем сайте заявка сразу уйдёт вам в мессенджер.</div></form></div></div></section>
     <footer class="s-foot"><div><b>Адрес</b>Брест, ${esc(o.addr)}<br><a href="${map}" target="_blank" rel="noopener">Открыть на карте</a></div>
       <div><b>Часы работы</b>${esc(o.hours||"уточняйте по телефону")}</div>
       ${o.contacts?.phones?.[0]?`<div><b>Телефон</b>${esc(o.contacts.phones[0].n)}</div>`:""}
       ${o.ig?`<div><b>Instagram</b><a href="https://instagram.com/${esc(o.ig.h)}" target="_blank" rel="noopener">@${esc(o.ig.h)}</a></div>`:""}</footer>
     <div class="s-demo">Демо-версия сайта, подготовлена для «${esc(o.name)}». Тексты и цены заменяются на ваши.</div>
   </div></div>`;
+}
+// fade-up on scroll for [data-r] blocks; only switched on when IntersectionObserver exists
+function reveal(root){
+  const site = root.querySelector(".site"); if (!site || !("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  site.classList.add("rv");
+  // the observer reports every target once right after observe(); if it stays silent (background tab, odd in-app browser), show everything
+  let alive = false;
+  const io = new IntersectionObserver(es => { alive = true; es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px" });
+  site.querySelectorAll("[data-r]").forEach(el => io.observe(el));
+  setTimeout(() => { if (!alive) { io.disconnect(); site.querySelectorAll("[data-r]").forEach(el => el.style.transition = "none"); site.classList.remove("rv"); } }, 1500);
 }
 
 let DATA = [], cur = null;
@@ -332,7 +439,7 @@ function renderSheet(o){
         <h3 style="margin-top:14px">7-й день, последнее</h3><div class="msg" id="m-fu7">${esc(fill(o,o.fu7))}</div><div class="row"><button class="btn" type="button" data-copy="fu7">Скопировать</button></div></details>`:""}
       ${o.closed?"":`<div class="block"><h3>Картинка к сообщению</h3><div class="shot"><img src="shots/${o.i}.jpg" alt="Демо на экране телефона" loading="lazy">
         <div><p class="mute">Отправьте вместе с первым сообщением: в Instagram незнакомые ссылки видны не сразу, а картинку с их заведением замечают.</p>
-        <div class="row"><a class="btn" href="shots/${o.i}.jpg" download="demo-${o.i}.jpg">Скачать</a><a class="btn ghost" href="shots/${o.i}.jpg" target="_blank" rel="noopener">Открыть</a></div></div></div></div>`}
+        <div class="row"><button class="btn" type="button" id="dl" hidden>Скачать</button><a class="btn ghost" href="shots/${o.i}.jpg" target="_blank" rel="noopener">Открыть</a></div></div></div></div>`}
       <div class="block"><h3>Зачем им сайт</h3><ul class="why">${(o.why||[]).map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>
       <div class="block"><h3>Что предлагаем</h3><div class="price">${esc(o.type)} · от <b>${o.price}</b> BYN · поддержка ${o.monthly} BYN/мес</div></div>
     </div>
@@ -341,14 +448,21 @@ function renderSheet(o){
   document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copy(fill(o, o[b.dataset.copy]), "Скопировано", document.getElementById("m-" + b.dataset.copy)));
   document.getElementById("copyd").onclick = () => copy(demoUrl(o), "Ссылка скопирована", document.getElementById("m-msg"));
   drawStatus(o);
+  // saving a file goes through the viewer's downloads capability; without it only "Открыть" stays
+  const dl = document.getElementById("dl");
+  if (dl) DLS().then(d => { if (!d) return; dl.hidden = false; dl.onclick = async () => {
+    try { const blob = await fetch(`shots/${o.i}.jpg`).then(r => r.blob()); await d.save({ filename: `demo-${o.slug || o.i}.jpg`, data: blob }); }
+    catch (e) { if (e && e.code !== "declined") toast("Не получилось сохранить, нажмите «Открыть»"); }
+  }; });
 }
+let DLP = null; const DLS = () => DLP || (DLP = window.claude?.use ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null));
 
 function route(){
   const h = location.hash.slice(1), id = +h.slice(1), o = DATA.find(x => x.i === id);
   document.body.style.background = "";
   if (h === "stats") { renderStats(); return; }
   if (h === "kit") { renderKit(); return; }
-  if (h[0] === "d" && o) { document.title = o.name; app.innerHTML = demo(o); countOpen(o); document.body.style.background = (o.palette||["#faf7f2"])[0]; cur = null; return; }
+  if (h[0] === "d" && o) { document.title = o.name; app.innerHTML = demo(o); reveal(app); countOpen(o); document.body.style.background = (o.palette||["#faf7f2"])[0]; cur = null; return; }
   if (!DATA.some(x => x.msg)) { app.innerHTML = `<p class="hub">Откройте ссылку на демо-сайт, которую вам прислали.</p>`; return; }
   document.title = "Брест: 50 офферов";
   if (!document.getElementById("sheet")) renderHub();
