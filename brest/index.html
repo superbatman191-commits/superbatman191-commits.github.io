@@ -481,10 +481,8 @@ function route(){
 
 // demo forms and in-site buttons, shared by both views
 document.addEventListener("submit", e => { if (e.target.matches("[data-demo]")) { e.preventDefault(); e.target.querySelector(".ok").hidden = false;
-  const o = DATA.find(x => location.hash === "#d" + x.i), v = [...e.target.querySelectorAll("input")].map(i => `${i.placeholder}: ${i.value.trim() || "—"}`).join("
-");
-  if (o) notify(`Заявка из демо: ${o.name}
-${v}`, "bell"); } });
+  const o = DATA.find(x => location.hash === "#d" + x.i), v = [...e.target.querySelectorAll("input")].map(i => `${i.placeholder}: ${i.value.trim() || "—"}`).join("\n");
+  if (o) notify(`Заявка из демо: ${o.name}\n${v}`, "bell"); } });
 document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) b.closest(".site").querySelector(".s-book").scrollIntoView({behavior:"smooth",block:"center"}); });
 
 fetch("offers.json").then(r => r.json()).then(d => { DATA = d; addEventListener("hashchange", route); route(); initDb(); })
