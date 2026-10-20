@@ -430,7 +430,7 @@ function renderHub(){
 function compBlock(o){
   const c = o.comp; if (!c || o.closed) return "";
   return `<div class="block"><h3>Конкуренты в поиске</h3>
-    <p class="mute">Яндекс Карты, «${esc(c.q)}» в Бресте: ${c.pos?`вы на ${c.pos} месте, `:"вас нет среди первых результатов, "}свой сайт у ${c.withSite} из первых ${c.total}.${c.note?` <b>${esc(c.note)}.</b>`:""}</p>
+    <p class="mute">Яндекс Карты, «${esc(c.q)}» в ${({"Пинск":"Пинске","Барановичи":"Барановичах","Кобрин":"Кобрине"})[o.city]||"Бресте"}: ${c.pos?`вы на ${c.pos} месте, `:"вас нет среди первых результатов, "}свой сайт у ${c.withSite} из первых ${c.total}.${c.note?` <b>${esc(c.note)}.</b>`:""}</p>
     ${c.top.length?`<div class="contacts">${c.top.map(t=>`<div class="ct" style="grid-template-columns:1fr auto"><span>${esc(t.n)} · <a href="https://${esc(t.site)}" target="_blank" rel="noopener">${esc(t.site)}</a></span><span class="mute">${t.r?`★ ${t.r} · ${t.v}`:""}</span></div>`).join("")}</div>`:""}
     ${c.line?`<div class="msg" id="m-cline" style="margin-top:10px">${esc(c.line)}</div><div class="row"><button class="btn" type="button" id="ccopy">Скопировать фразу</button></div>`:""}</div>`;
 }
