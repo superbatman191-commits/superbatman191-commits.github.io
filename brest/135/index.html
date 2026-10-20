@@ -193,6 +193,17 @@ details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
 .s-gal.n1 div:first-child,.s-gal.n2 div:first-child,.s-gal.n4 div:first-child{grid-column:auto;grid-row:auto}
 .s-gal.n3 div:first-child{grid-column:auto;grid-row:span 2}
 
+/* reviews: three bezel quote cards */
+.s-rev{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.s-rev .s-shell{border-radius:26px;padding:5px}
+.s-rev figure{margin:0;border-radius:21px;background:var(--d-bg);padding:22px 20px;height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.s-rev blockquote{margin:0;font-size:16px;line-height:1.55}
+.s-rev figcaption{font-size:13px;color:var(--d-mute)}
+.s-rev figcaption span{color:var(--d-ac);letter-spacing:.1em;margin-right:6px}
+.dark .s-rev figcaption span{color:color-mix(in srgb,var(--d-ac) 70%,#fff)}
+.frame .s-rev{grid-template-columns:1fr}
+@media (max-width:900px){.s-rev{grid-template-columns:1fr}}
+
 /* menu / prices */
 .s-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 40px}
 .s-menu div{display:flex;justify-content:space-between;gap:16px;padding-block:15px;border-bottom:1px solid var(--d-line);font-size:16px}
@@ -297,6 +308,9 @@ function demo(o){
       <div class="s-feat">${(o.features||[]).slice(0,4).map((f,k)=>`<div class="s-shell" data-r style="transition-delay:${k*80}ms"><div class="s-core"><small>0${k+1}</small><b>${esc(f)}</b></div></div>`).join("")}</div></section>
     ${ph.length?`<section class="s-sec"><div class="s-head" data-r><span class="s-eye">Атмосфера</span><h2>Загляните к нам</h2></div>
       <div class="s-gal n${ph.length}" data-r>${ph.map(p=>`<div><img src="${esc(p.f)}" alt="" loading="lazy"></div>`).join("")}</div></section>`:""}
+    ${(o.reviews||[]).length?`<section class="s-sec"><div class="s-head" data-r><span class="s-eye">Отзывы</span><h2>Что о нас говорят</h2></div>
+      <div class="s-rev">${o.reviews.map((r,k)=>`<div class="s-shell" data-r style="transition-delay:${k*80}ms"><figure class="s-core"><blockquote>${esc(r.t)}</blockquote><figcaption><span aria-hidden="true">${"★".repeat(r.r||5)}</span> ${esc(r.a)}</figcaption></figure></div>`).join("")}</div>
+      <span class="s-pill" data-r>Отзывы с вашей карточки на Яндекс Картах</span></section>`:""}
     <section class="s-sec"><div class="s-head" data-r><span class="s-eye">${real?"Цены":"Меню и услуги"}</span><h2>${esc(o.menuTitle||s.title)}</h2>${o.bill?`<p class="s-note">Средний чек ${esc(o.bill.replace(/ Br$/," р."))}</p>`:""}</div>
       <div class="s-menu${real?"":" names"}" data-r>${(real?o.prices.map(p=>[esc(p[0]),fmtPrice(p[1])]):(o.items&&o.items.length?o.items.map(x=>[esc(x),""]):s.rows.map(r=>[r[0],""]))).map(r=>`<div><span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>
       <span class="s-pill" data-r>${real?"Цены из вашей карточки на Яндекс Картах":"Здесь будет ваше меню с актуальными ценами"}</span></section>
@@ -330,9 +344,44 @@ async function initDb(){
   if (!DB) return;
   DB.collection("status").onSnapshot(snap => {
     ST = {}; snap.docs.forEach(d => { if (d.exists) ST[d.id] = d.data(); });
-    window._draw && window._draw(); if (cur) drawStatus(cur);
+    window._draw && window._draw(); if (cur) drawStatus(cur); if (location.hash === "#today") renderToday();
   }, () => {});
   if (cur) drawStatus(cur);
+}
+// set() replaces the doc, so keep the other fields (sentAt, fu3, fu7); sentAt = first switch to "Написал", the follow-up clock
+function saveSt(o, patch){
+  const prev = ST[o.i] || {}, now = new Date().toISOString();
+  const doc = { s: stOf(o), note: prev.note || "", ...prev, ...patch, at: now };
+  if (patch.s === "sent" && !prev.sentAt) doc.sentAt = now;
+  return DB.collection("status").doc(String(o.i)).set(doc)
+    .catch(e => toast(e && e.code === "permission_denied" ? "Нет прав на запись" : "Не сохранилось, попробуйте ещё раз"));
+}
+// #today: follow-ups due (day 3 and day 7 after "Написал"), replies waiting for an answer, demo opens of the contacted
+async function renderToday(){
+  document.title = "Сегодня";
+  app.innerHTML = `<div class="hub" style="display:block;max-width:820px"><p><a href="#">← К списку организаций</a></p><h1 style="font-size:22px;margin:8px 0">Сегодня</h1><div id="td" class="contacts">${DB ? "Загрузка…" : "Статусы доступны только в опубликованной версии на claude.ai."}</div></div>`;
+  if (!DB) return;
+  const day = 864e5, now = Date.now(), box = document.getElementById("td");
+  const sent = DATA.filter(o => stOf(o) === "sent"), replied = DATA.filter(o => stOf(o) === "replied");
+  const opens = Object.fromEntries(await Promise.all(sent.concat(replied).map(o => fetch(`${CNT}/get/rbbrestdemo/d${o.i}`).then(r => r.json()).then(j => [o.i, j.value || 0]).catch(() => [o.i, "?"]))));
+  const due = [];
+  for (const o of sent) {
+    const st = ST[o.i], d = Math.floor((now - Date.parse(st.sentAt || st.at)) / day);
+    if (d >= 7 && !st.fu7) due.push([o, "fu7", d]); else if (d >= 3 && !st.fu3) due.push([o, "fu3", d]);
+  }
+  const card = ([o, k, d]) => `<div class="block" style="border-bottom:1px solid var(--line);padding-bottom:14px">
+    <h3>${esc(o.name)} · ${esc(o.city || "Брест")} · ${d} дн. назад · демо открывали: ${opens[o.i]}</h3>
+    <div class="msg" id="m-t${o.i}">${esc(fill(o, o[k]))}</div>
+    <div class="row"><button class="btn" type="button" data-tc="${o.i}" data-k="${k}">Скопировать ${k === "fu3" ? "повтор 3-го дня" : "последнее сообщение"}</button>
+    <button class="btn ghost" type="button" data-td="${o.i}" data-k="${k}">Отправил</button><a class="btn ghost" href="#o${o.i}">Открыть</a></div></div>`;
+  box.innerHTML = `${due.length ? due.map(card).join("") : `<p class="mute">Повторов на сегодня нет.</p>`}
+    <h3 style="margin-top:18px">Ответили, ждут вашего ответа</h3>${replied.length ? replied.map(o => `<div class="ct" style="grid-template-columns:1fr auto"><a href="#o${o.i}">${esc(o.name)} · ${esc(o.city || "Брест")}</a><small>${esc((ST[o.i].note || "").slice(0, 80))}</small></div>`).join("") : `<p class="mute">Пока никого.</p>`}
+    <h3 style="margin-top:18px">Написали, ждём ответа (${sent.length})</h3>${sent.map(o => `<div class="ct" style="grid-template-columns:1fr auto"><a href="#o${o.i}">${esc(o.name)} · ${esc(o.city || "Брест")}</a><small>открывали демо: ${opens[o.i]}</small></div>`).join("")}`;
+  box.onclick = e => {
+    const c = e.target.closest("[data-tc]"), t = e.target.closest("[data-td]");
+    if (c) { const o = DATA.find(x => x.i === +c.dataset.tc); copy(fill(o, o[c.dataset.k]), "Скопировано", document.getElementById("m-t" + o.i)); }
+    if (t) { const o = DATA.find(x => x.i === +t.dataset.td); saveSt(o, { [t.dataset.k]: new Date().toISOString() }).then(() => renderToday()); }
+  };
 }
 function drawStatus(o){
   const box = document.getElementById("st"); if (!box) return;
@@ -341,8 +390,7 @@ function drawStatus(o){
   box.innerHTML = `<div class="seg" role="group" aria-label="Статус">${STATUSES.map(([v,l]) => `<button type="button" data-st="${v}" aria-pressed="${s===v}" class="st-${v}">${l}</button>`).join("")}</div>
     <input id="note-${o.i}" class="note" placeholder="Заметка: кто ответил, когда перезвонить" value="${esc(note)}">
     ${at ? `<small class="mute">Обновлено ${new Date(at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small>` : ""}`;
-  const save = (patch) => DB.collection("status").doc(String(o.i)).set({ s: stOf(o), note: (ST[o.i] && ST[o.i].note) || "", ...patch, at: new Date().toISOString() })
-    .catch(e => toast(e && e.code === "permission_denied" ? "Нет прав на запись" : "Не сохранилось, попробуйте ещё раз"));
+  const save = (patch) => saveSt(o, patch);
   box.querySelector(".seg").onclick = e => { const b = e.target.closest("[data-st]"); if (b && b.dataset.st !== s) save({ s: b.dataset.st }); };
   const n = box.querySelector(".note"); n.onchange = () => { if (n.value !== note) save({ note: n.value.slice(0, 500) }); };
 }
@@ -412,7 +460,7 @@ function msgText(o){ return fill(o, o.msg); }
 
 function renderHub(){
   app.innerHTML = `<div class="hub"><aside class="rail"><h1>Офферы: бизнес без сайта</h1>
-    <p class="lead">Сообщение для первого контакта, аргументы и демо-сайт под каждую организацию. <a href="${DEMO_BASE}#stats" target="_blank" rel="noopener">Кто открывал демо</a> · <a href="#kit">Скрипты и возражения</a></p>
+    <p class="lead">Сообщение для первого контакта, аргументы и демо-сайт под каждую организацию. <a href="${DEMO_BASE}#stats" target="_blank" rel="noopener">Кто открывал демо</a> · <a href="#kit">Скрипты и возражения</a> · <a href="#today"><b>Сегодня</b></a></p>
     <div class="filters"><input id="q" placeholder="Поиск по названию" aria-label="Поиск"><select id="k" aria-label="Тип">
     <option value="">Все</option><option value="food">Еда</option><option value="beauty">Красота</option><option value="auto">Авто и спорт</option><option value="clean">Медицина</option><option value="stay">Жильё</option></select><select id="ci" aria-label="Город"><option value="">Все города</option>${[...new Set(DATA.map(o=>o.city||"Брест"))].map(c=>`<option>${esc(c)}</option>`).join("")}</select><select id="sf" aria-label="Статус"><option value="">Любой статус</option><option value="w1">Волна 1</option>${STATUSES.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
     <div class="list" id="list"></div></aside><main class="sheet" id="sheet"></main></div>`;
@@ -456,7 +504,7 @@ function renderSheet(o){
         <h3 style="margin-top:14px">7-й день, последнее</h3><div class="msg" id="m-fu7">${esc(fill(o,o.fu7))}</div><div class="row"><button class="btn" type="button" data-copy="fu7">Скопировать</button></div></details>`:""}
       ${o.closed?"":`<div class="block"><h3>Картинка к сообщению</h3><div class="shot"><img src="shots/${o.i}.jpg" alt="Демо на экране телефона" loading="lazy">
         <div><p class="mute">Отправьте вместе с первым сообщением: в Instagram незнакомые ссылки видны не сразу, а картинку с их заведением замечают.</p>
-        <div class="row"><button class="btn" type="button" id="dl" hidden>Скачать</button><a class="btn ghost" href="shots/${o.i}.jpg" target="_blank" rel="noopener">Открыть</a></div></div></div></div>`}
+        <div class="row"><button class="btn" type="button" id="dl" hidden>Скачать</button><a class="btn ghost" href="shots/${o.i}.jpg" target="_blank" rel="noopener">Открыть</a><a class="btn ghost" href="${DEMO_ROOT}${o.citySlug || "brest"}/vid/${o.i}.mp4" target="_blank" rel="noopener">Видео</a></div></div></div></div>`}
       <div class="block"><h3>Зачем им сайт</h3><ul class="why">${(o.why||[]).map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>
       <div class="block"><h3>Что предлагаем</h3><div class="price">${esc(o.type)} · от <b>${o.price}</b> BYN · поддержка ${o.monthly} BYN/мес</div></div>
     </div>
@@ -480,6 +528,7 @@ function route(){
   document.body.style.background = "";
   if (h === "stats") { renderStats(); return; }
   if (h === "kit") { renderKit(); return; }
+  if (h === "today") { renderToday(); return; }
   if (h[0] === "d" && o) { document.title = o.name; app.innerHTML = demo(o); reveal(app); countOpen(o); document.body.style.background = (o.palette||["#faf7f2"])[0]; cur = null; return; }
   if (!DATA.some(x => x.msg)) { app.innerHTML = `<p class="hub">Откройте ссылку на демо-сайт, которую вам прислали.</p>`; return; }
   document.title = "Офферы: бизнес без сайта";
