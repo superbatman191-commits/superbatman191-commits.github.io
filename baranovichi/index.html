@@ -222,6 +222,18 @@ details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:600}
 .s-foot b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--d-mute);font-weight:600;margin-bottom:6px}
 .s-foot a{color:inherit;text-decoration-color:color-mix(in srgb,var(--d-ac) 60%,transparent);text-underline-offset:3px}
 .s-demo{font-size:12px;text-align:center;color:var(--d-mute);padding-block:18px 26px}
+/* "want this site" strip for the owner + floating pill that scrolls to it (full-page demo only) */
+.s-want{margin-top:28px;display:grid;grid-template-columns:1fr auto;gap:14px 20px;align-items:center;padding:clamp(20px,3vw,32px);border-radius:26px;background:var(--d-fg);color:var(--d-bg)}
+.s-want b{font-family:var(--d-disp);font-size:clamp(20px,2.4vw,26px);font-weight:600;line-height:1.2}
+.s-want p{margin:4px 0 0;opacity:.75;font-size:14px}
+.s-want form{display:flex;gap:8px;flex-wrap:wrap}
+.s-want input{flex:1 1 180px;min-width:0;padding:12px 16px;border-radius:999px;border:0;background:var(--d-bg);color:var(--d-fg);font-size:15px}
+.s-want .s-cta{background:var(--d-btn);color:var(--d-on)}
+.s-want .ok{grid-column:1/-1;font-size:14px}
+.s-float{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:3;box-shadow:0 12px 30px -10px rgba(0,0,0,.35);opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.s-float.on{opacity:1;pointer-events:auto;transform:none}
+.frame .s-float{display:none}
+@media (max-width:700px){.s-want{grid-template-columns:1fr}}
 
 /* scroll reveal: added by JS only, so content stays visible without it */
 .site.rv [data-r]{opacity:0;transform:translateY(28px);filter:blur(6px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)}
@@ -316,7 +328,10 @@ function demo(o){
       <div><b>Часы работы</b>${esc(o.hours||"уточняйте по телефону")}</div>
       ${o.contacts?.phones?.[0]?`<div><b>Телефон</b>${esc(o.contacts.phones[0].n)}</div>`:""}
       ${o.ig?`<div><b>Instagram</b><a href="https://instagram.com/${esc(o.ig.h)}" target="_blank" rel="noopener">@${esc(o.ig.h)}</a></div>`:""}</footer>
+    <section class="s-want"><div><b>Это демо сделано для «${esc(o.name)}»</b><p>Нравится? Оставьте телефон или ник в Telegram, Роман напишет вам сегодня и расскажет, как запустить такой сайт.</p></div>
+      <form data-want><input name="c" placeholder="Телефон или @ник" aria-label="Телефон или ник" required><button class="s-cta">Хочу такой сайт${arrow}</button><div class="ok" hidden>Спасибо! Роман скоро напишет.</div></form></section>
     <div class="s-demo">Демо-версия сайта, подготовлена для «${esc(o.name)}». Тексты и цены заменяются на ваши.</div>
+    <button class="s-cta s-float" type="button" data-go="want">Хочу такой сайт</button>
   </div></div>`;
 }
 // fade-up on scroll for [data-r] blocks; only switched on when IntersectionObserver exists
@@ -342,7 +357,25 @@ async function initDb(){
     ST = {}; snap.docs.forEach(d => { if (d.exists) ST[d.id] = d.data(); });
     window._draw && window._draw(); if (cur) drawStatus(cur); if (location.hash === "#today") renderToday();
   }, () => {});
+  // meta/opens: demo-open counters as of the last "Просмотрено" click, so #today shows who opened since then
+  DB.collection("meta").onSnapshot(snap => { META = {}; snap.docs.forEach(d => { if (d.exists) META[d.id] = d.data(); }); }, () => {});
   if (cur) drawStatus(cur);
+}
+let META = {}, OPENS = null;
+// all demo-open counters, cached for a minute (#today redraws on every status change)
+async function getOpens(){
+  if (OPENS && Date.now() - OPENS.t < 6e4) return OPENS.v;
+  const v = Object.fromEntries(await Promise.all(DATA.filter(o => !o.closed).map(o => fetch(`${CNT}/get/rbbrestdemo/d${o.i}`).then(r => r.json()).then(j => [o.i, j.value || 0]).catch(() => [o.i, "?"]))));
+  OPENS = { t: Date.now(), v }; return v;
+}
+// conversion by message variant (A long / B short) and by channel the send button used
+function funnel(){
+  const rows = {}, add = (g, o) => { const r = rows[g] ||= [0, 0, 0], s = stOf(o); r[0]++; if (s === "replied" || s === "deal") r[1]++; if (s === "deal") r[2]++; };
+  for (const o of DATA) { if (stOf(o) === "new") continue; add(`Вариант ${firstKey(o) === "short" ? "B (короткий)" : "A (подробный)"}`, o); add(`Канал: ${ST[o.i]?.ch || "не отмечен"}`, o); add("Всего", o); }
+  const pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "–";
+  return Object.keys(rows).length ? `<div class="ct" style="grid-template-columns:1fr repeat(3,auto);gap:4px 16px"><small>Группа</small><small>Написал</small><small>Ответили</small><small>Сделка</small>
+    ${Object.entries(rows).sort((a, b) => b[0] === "Всего" ? 1 : a[0].localeCompare(b[0])).map(([g, [n, r, d]]) => `<span>${esc(g)}</span><b class="num">${n}</b><span class="num">${r} · ${pct(r, n)}</span><span class="num">${d} · ${pct(d, n)}</span>`).join("")}</div>`
+    : `<p class="mute">Появится после первых отправок.</p>`;
 }
 // set() replaces the doc, so keep the other fields (sentAt, fu3, fu7); sentAt = first switch to "Написал", the follow-up clock
 function saveSt(o, patch){
@@ -359,7 +392,8 @@ async function renderToday(){
   if (!DB) return;
   const day = 864e5, now = Date.now(), box = document.getElementById("td");
   const sent = DATA.filter(o => stOf(o) === "sent"), replied = DATA.filter(o => stOf(o) === "replied");
-  const opens = Object.fromEntries(await Promise.all(sent.concat(replied).map(o => fetch(`${CNT}/get/rbbrestdemo/d${o.i}`).then(r => r.json()).then(j => [o.i, j.value || 0]).catch(() => [o.i, "?"]))));
+  const opens = await getOpens(), seen = META.opens?.c || {};
+  const hot = DATA.filter(o => !o.closed && opens[o.i] > (seen[o.i] || 0) && stOf(o) !== "refused" && stOf(o) !== "deal");
   const due = [];
   for (const o of sent) {
     const st = ST[o.i], d = Math.floor((now - Date.parse(st.sentAt || st.at)) / day);
@@ -370,7 +404,12 @@ async function renderToday(){
     <div class="msg" id="m-t${o.i}">${esc(fill(o, o[k]))}</div>
     <div class="row"><button class="btn" type="button" data-ts="${o.i}" data-k="${k}">Отправить ${k === "fu3" ? "повтор 3-го дня" : "последнее сообщение"}${channel(o) ? ` · ${esc(channel(o).t)}` : ""}</button>
     <button class="btn ghost" type="button" data-td="${o.i}" data-k="${k}">Уже отправил</button>${k === "fu7" ? `<button class="btn ghost" type="button" data-tr="${o.i}">Отказ</button>` : ""}<a class="btn ghost" href="#o${o.i}">Открыть</a></div></div>`;
-  box.innerHTML = `${due.length ? due.map(card).join("") : `<p class="mute">Повторов на сегодня нет.</p>`}
+  box.innerHTML = `<h3>Открыли демо с прошлого просмотра${META.opens?.at ? ` (${new Date(META.opens.at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})})` : ""}</h3>
+    ${hot.length ? hot.map(o => `<div class="ct" style="grid-template-columns:1fr auto auto;align-items:center"><a href="#o${o.i}"><b>${esc(o.name)}</b> · ${esc(o.city || "Брест")}</a><small>+${opens[o.i] - (seen[o.i] || 0)} · ${esc(STATUSES.find(x => x[0] === stOf(o))[1])}</small>
+      <button class="btn" type="button" data-ts="${o.i}" data-k="${stOf(o) === "new" ? firstKey(o) : "fu3"}" style="padding:5px 12px">Написать сейчас</button></div>`).join("")
+      + `<div class="row"><button class="btn ghost" type="button" id="seen">Просмотрено</button></div>` : `<p class="mute">Новых открытий нет.</p>`}
+    <h3 style="margin-top:18px">Повторы на сегодня</h3>
+    ${due.length ? due.map(card).join("") : `<p class="mute">Повторов на сегодня нет.</p>`}
     <h3 style="margin-top:18px">Ответили, ждут вашего ответа</h3>${replied.length ? replied.map(o => `<div class="ct" style="grid-template-columns:1fr auto"><a href="#o${o.i}">${esc(o.name)} · ${esc(o.city || "Брест")}</a><small>${esc((ST[o.i].note || "").slice(0, 80))}</small></div>`).join("") : `<p class="mute">Пока никого.</p>`}
     <h3 style="margin-top:18px">Написали, ждём ответа (${sent.length})</h3>${sent.map(o => `<div class="ct" style="grid-template-columns:1fr auto"><a href="#o${o.i}">${esc(o.name)} · ${esc(o.city || "Брест")}</a><small>открывали демо: ${opens[o.i]}</small></div>`).join("")}`;
   box.onclick = e => {
@@ -378,7 +417,20 @@ async function renderToday(){
     if (c) { const o = DATA.find(x => x.i === +c.dataset.ts); sendOut(o, c.dataset.k).then(() => renderToday()); }
     if (t) { const o = DATA.find(x => x.i === +t.dataset.td); saveSt(o, { [t.dataset.k]: new Date().toISOString() }).then(() => renderToday()); }
     if (r) { const o = DATA.find(x => x.i === +r.dataset.tr); saveSt(o, { s: "refused" }).then(() => renderToday()); }
+    if (e.target.id === "seen") DB.collection("meta").doc("opens").set({ c: opens, at: new Date().toISOString() }).then(() => { META.opens = { c: opens, at: new Date().toISOString() }; renderToday(); }).catch(() => toast("Не сохранилось"));
   };
+  box.insertAdjacentHTML("beforeend", `<h3 style="margin-top:22px">Воронка</h3>${funnel()}`);
+}
+// once they replied: objection answers from the kit (#kit "Возражения" section) right in the card, click copies one
+let KIT = null;
+async function drawObjections(o){
+  const box = document.getElementById("obj"); if (!box) return;
+  if (!["replied", "deal"].includes(stOf(o))) { box.innerHTML = ""; return; }
+  KIT ||= fetch("kit.json").then(r => r.json()).catch(() => null);
+  const k = await KIT, html = k?.html || "", a = html.indexOf("<h3>Возражения</h3>"); if (a < 0) return;
+  const b = html.indexOf("<h3>", a + 5);
+  box.innerHTML = `<details class="block kit" open><summary>Ответы на возражения: нажмите на ответ, чтобы скопировать</summary>${html.slice(a + 19, b < 0 ? undefined : b)}</details>`;
+  box.onclick = e => { const p = e.target.closest("p"); if (!p || !p.querySelector("b")) return; copy(p.innerText.replace(/^Вариант \d+:\s*/, "").trim(), "Ответ скопирован", p); };
 }
 function drawStatus(o){
   const box = document.getElementById("st"); if (!box) return;
@@ -387,6 +439,7 @@ function drawStatus(o){
   box.innerHTML = `<div class="seg" role="group" aria-label="Статус">${STATUSES.map(([v,l]) => `<button type="button" data-st="${v}" aria-pressed="${s===v}" class="st-${v}">${l}</button>`).join("")}</div>
     <input id="note-${o.i}" class="note" placeholder="Заметка: кто ответил, когда перезвонить" value="${esc(note)}">
     ${at ? `<small class="mute">Обновлено ${new Date(at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</small>` : ""}`;
+  drawObjections(o);
   const save = (patch) => saveSt(o, patch);
   box.querySelector(".seg").onclick = e => { const b = e.target.closest("[data-st]"); if (b && b.dataset.st !== s) save({ s: b.dataset.st }); };
   const n = box.querySelector(".note"); n.onchange = () => { if (n.value !== note) save({ note: n.value.slice(0, 500) }); };
@@ -467,13 +520,13 @@ function countOpen(o){
   if (!location.hostname.endsWith("github.io") || store("rbme")) return;
   try { if (sessionStorage.getItem("seen" + o.i)) return; sessionStorage.setItem("seen" + o.i, "1"); } catch {}
   fetch(`${CNT}/hit/rbbrestdemo/d${o.i}`).catch(() => {});
-  notify(`Открыли демо: ${o.name}`, "eyes");
+  notify(`Открыли демо: ${o.name} (${o.city || "Брест"}). Хороший момент написать`, "eyes", { Click: HUB + "#o" + o.i });
 }
-// push to the owner's phone via ntfy.sh (free, no account): subscribe to this topic in the ntfy app
-const NTFY = "https://ntfy.sh/rbdemo-33e5cd7dad43";
-function notify(text, tag){
+// push to the owner's phone via ntfy.sh (free, no account): subscribe to this topic in the ntfy app; tapping it opens the hub
+const NTFY = "https://ntfy.sh/rbdemo-33e5cd7dad43", HUB = "https://claude.ai/artifact/MfW97FuMXxE5otutYsyV7z";
+function notify(text, tag, extra){
   if (!location.hostname.endsWith("github.io") || store("rbme")) return;
-  fetch(NTFY, { method: "POST", body: text, headers: { Tags: tag } }).catch(() => {});
+  fetch(NTFY, { method: "POST", body: text, headers: { Tags: tag, ...extra } }).catch(() => {});
 }
 async function renderStats(){
   document.title = "Открытия демо";
@@ -533,7 +586,7 @@ let selMode = false; const SEL = new Set();
 function compBlock(o){
   const c = o.comp; if (!c || o.closed) return "";
   return `<div class="block"><h3>Конкуренты в поиске</h3>
-    <p class="mute">Яндекс Карты, «${esc(c.q)}» в ${({"Пинск":"Пинске","Барановичи":"Барановичах","Кобрин":"Кобрине"})[o.city]||"Бресте"}: ${c.pos?`вы на ${c.pos} месте, `:"вас нет среди первых результатов, "}свой сайт у ${c.withSite} из первых ${c.total}.${c.note?` <b>${esc(c.note)}.</b>`:""}</p>
+    <p class="mute">Яндекс Карты, «${esc(c.q)}» в ${({"Пинск":"Пинске","Барановичи":"Барановичах","Кобрин":"Кобрине","Жабинка":"Жабинке","Лунинец":"Лунинце","Берёза":"Берёзе","Ивацевичи":"Ивацевичах"})[o.city]||"Бресте"}: ${c.pos?`вы на ${c.pos} месте, `:"вас нет среди первых результатов, "}свой сайт у ${c.withSite} из первых ${c.total}.${c.note?` <b>${esc(c.note)}.</b>`:""}</p>
     ${c.top.length?`<div class="contacts">${c.top.map(t=>`<div class="ct" style="grid-template-columns:1fr auto"><span>${esc(t.n)} · <a href="https://${esc(t.site)}" target="_blank" rel="noopener">${esc(t.site)}</a></span><span class="mute">${t.r?`★ ${t.r} · ${t.v}`:""}</span></div>`).join("")}</div>`:""}
     ${c.line?`<div class="msg" id="m-cline" style="margin-top:10px">${esc(c.line)}</div><div class="row"><button class="btn" type="button" id="ccopy">Скопировать фразу</button></div>`:""}</div>`;
 }
@@ -545,8 +598,9 @@ function renderSheet(o){
     ${ig?`<span class="chip"><a href="https://instagram.com/${esc(ig.h)}" target="_blank" rel="noopener">@${esc(ig.h)}</a>${ig.followers?` · ${esc(ig.followers)} подписчиков`:""}</span>`:`<span class="chip">Instagram не найден</span>`}
     ${o.wave?`<span class="chip">Волна 1 · вариант ${o.wave}</span>`:""}
     ${o.flag?`<span class="chip warn">${esc(o.flag)}</span>`:""}</div></div></header>
-    <div class="act">${o.closed?"":`<button class="btn" type="button" id="send" title="Копирует текст, открывает чат, сохраняет картинку, ставит «Написал»">Отправить${channel(o)?` · ${esc(channel(o).t)}`:" · только текст"}</button>`}<button class="btn ghost" type="button" id="next">Следующий новый →</button></div>
+    <div class="act">${o.closed?"":`<button class="btn" type="button" id="send" title="Копирует текст, открывает чат, сохраняет картинку, ставит «Написал»">Отправить${channel(o)?` · ${esc(channel(o).t)}`:" · только текст"}</button>`}<button class="btn ghost" type="button" id="next">Следующий новый →</button><small class="mute">Клавиши: S отправить · N следующий · 1–5 статус · / поиск</small></div>
     <div class="block"><h3>Статус</h3><div id="st" class="status"></div></div>
+    <div id="obj"></div>
     <div class="cols"><div style="display:flex;flex-direction:column;gap:18px;min-width:0">
       ${contactsBlock(o)}
       ${compBlock(o)}
@@ -560,7 +614,7 @@ function renderSheet(o){
         <div><p class="mute">Отправьте вместе с первым сообщением: в Instagram незнакомые ссылки видны не сразу, а картинку с их заведением замечают.</p>
         <div class="row"><button class="btn" type="button" id="dl" hidden>Скачать</button><a class="btn ghost" href="shots/${o.i}.jpg" target="_blank" rel="noopener">Открыть</a><a class="btn ghost" href="${DEMO_ROOT}${o.citySlug || "brest"}/vid/${o.i}.mp4" target="_blank" rel="noopener">Видео</a></div></div></div></div>`}
       <div class="block"><h3>Зачем им сайт</h3><ul class="why">${(o.why||[]).map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>
-      <div class="block"><h3>Что предлагаем</h3><div class="price">${esc(o.type)} · от <b>${o.price}</b> BYN · поддержка ${o.monthly} BYN/мес</div></div>
+      <div class="block"><h3>Что предлагаем</h3><div class="price">${esc(o.type)} · от <b>${o.price}</b> BYN · поддержка ${o.monthly} BYN/мес</div><p class="mute" style="margin:6px 0 0">После согласия: пакет «Сайт и карточки под ключ» за 60 BYN/мес (обновления, карточки на картах, ответы на отзывы). Текст в <a href="#kit">скриптах</a>.</p></div>
     </div>
     <div class="block" style="min-width:0"><h3>Демо-сайт</h3><div class="frame"><div class="bar"><i></i><i></i><i></i><span>${esc(o.slug||"")}.by</span></div>
       <div class="viewport">${demo(o)}</div></div></div></div>`;
@@ -593,7 +647,24 @@ function route(){
 document.addEventListener("submit", e => { if (e.target.matches("[data-demo]")) { e.preventDefault(); e.target.querySelector(".ok").hidden = false;
   const o = DATA.find(x => location.hash === "#d" + x.i), v = [...e.target.querySelectorAll("input")].map(i => `${i.placeholder}: ${i.value.trim() || "—"}`).join("\n");
   if (o) notify(`Заявка из демо: ${o.name}\n${v}`, "bell"); } });
-document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) b.closest(".site").querySelector(".s-book").scrollIntoView({behavior:"smooth",block:"center"}); });
+document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) b.closest(".site").querySelector(".s-" + b.dataset.go).scrollIntoView({behavior:"smooth",block:"center"}); });
+// hub hotkeys: S send, N next new, 1-5 status, / search (ignored while typing)
+document.addEventListener("keydown", e => {
+  if (!document.getElementById("sheet") || e.ctrlKey || e.metaKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return;
+  const k = e.key.toLowerCase(), click = id => { const b = document.getElementById(id); if (b) { e.preventDefault(); b.click(); } };
+  if (k === "s" || k === "ы") click("send");
+  else if (k === "n" || k === "т") click("next");
+  else if (k === "/") { e.preventDefault(); document.getElementById("q")?.focus(); }
+  else if (/^[1-5]$/.test(k)) { const b = document.querySelectorAll("#st [data-st]")[+k - 1]; if (b) { e.preventDefault(); b.click(); } }
+});
+// owner's "want this site": urgent push with the contact they left
+document.addEventListener("submit", e => { if (!e.target.matches("[data-want]")) return; e.preventDefault();
+  const o = DATA.find(x => location.hash === "#d" + x.i), c = e.target.c.value.trim(); if (!c) return;
+  e.target.querySelector(".ok").hidden = false; e.target.querySelector("button").disabled = true;
+  if (o) notify(`Хочет сайт: ${o.name} (${o.city || "Брест"})\nКонтакт: ${c}`, "fire", { Priority: "5", Click: HUB + "#o" + o.i }); });
+// the pill shows once the hero is scrolled past and hides near the strip itself
+addEventListener("scroll", () => { const f = document.querySelector("#app > .site .s-float"); if (!f) return;
+  const w = document.querySelector(".s-want").getBoundingClientRect().top; f.classList.toggle("on", scrollY > 500 && w > innerHeight); }, { passive: true });
 
 fetch("offers.json").then(r => r.json()).then(d => { DATA = d; addEventListener("hashchange", route); route(); initDb(); })
   .catch(() => { app.innerHTML = `<p class="hub">Не удалось загрузить offers.json. Обновите страницу.</p>`; });
